@@ -235,7 +235,7 @@
     <h2>Willkommen</h2>
     <p>Du wurdest zu einer Sprint Planning Session eingeladen. Wie heisst du?</p>
     <input type="text" id="guestNameInput" placeholder="Dein Name..." maxlength="24">
-    <button class="btn btn-gold" onclick="joinAsGuest()">Tisch betreten</button>
+    <button class="btn btn-gold" id="joinGuestBtn">Tisch betreten</button>
   </div>
 </div>
 
@@ -256,13 +256,7 @@
     <label>Dein Name (Host)</label>
     <input type="text" id="hostNameInput" placeholder="z.B. Bastian" maxlength="24">
 
-    <button class="btn btn-gold" id="createBtn" onclick="createSession()">Session erstellen &amp; Tisch öffnen</button>
-
-    <div class="divider">oder</div>
-
-    <label>Einladungs-Link eingeben</label>
-    <input type="text" id="joinLinkInput" placeholder="Sprint-Poker-Link einfügen...">
-    <button class="btn btn-outline" onclick="joinViaLink()">Session beitreten</button>
+    <button class="btn btn-gold" id="createBtn" >Session erstellen &amp; Tisch öffnen</button>
   </div>
 </div>
 
@@ -282,7 +276,7 @@
         <div style="font-size:11px;color:var(--text-muted);letter-spacing:0.1em;margin-bottom:4px;">EINLADUNGSLINK</div>
         <div class="invite-url" id="inviteUrl"></div>
       </div>
-      <button class="copy-btn" id="copyBtn" onclick="copyInvite()">Kopieren</button>
+      <button class="copy-btn" id="copyBtn" >Kopieren</button>
     </div>
 
     <div class="status-bar" id="statusBar"></div>
@@ -291,14 +285,20 @@
     <div class="felt-table">
       <div class="story-label">Aktuelle Story</div>
       <div class="story-title" id="storyTitle">–</div>
-      <button class="story-edit-btn hidden" id="editStoryBtn" onclick="editStory()">✎ Story ändern</button>
+      <button class="story-edit-btn hidden" id="editStoryBtn" >✎ Story ändern</button>
       <div class="players-ring" id="playersRing"></div>
     </div>
 
     <!-- Host Controls -->
     <div class="host-controls hidden" id="hostControls">
-      <button class="btn btn-gold btn-sm" id="revealBtn" onclick="revealCards()" disabled>Karten aufdecken</button>
-      <button class="btn btn-outline btn-sm hidden" id="resetBtn" onclick="resetRound()">Neue Runde</button>
+      <button class="btn btn-gold btn-sm" id="revealBtn" disabled>Karten aufdecken</button>
+      <button class="btn btn-outline btn-sm hidden" id="resetBtn" >Neue Runde</button>
+      <button class="btn btn-outline btn-sm" id="spectatorBtn" >Zuschauermodus</button>
+    </div>
+
+    <!-- Guest Controls -->
+    <div class="host-controls hidden" id="guestControls">
+      <button class="btn btn-outline btn-sm"  style="color:#e87a7a;border-color:rgba(232,122,122,0.3)">Session verlassen</button>
     </div>
 
     <!-- Vote Area -->
@@ -306,8 +306,8 @@
       <h3>Deine Schätzung</h3>
       <div class="number-chips" id="chipRow"></div>
       <div class="vote-submit-row">
-        <button class="btn btn-gold btn-sm" id="lockBtn" onclick="lockVote()">Einlocken</button>
-        <button class="btn btn-outline btn-sm hidden" id="changeBtn" onclick="changeVote()">Ändern</button>
+        <button class="btn btn-gold btn-sm" id="lockBtn" >Einlocken</button>
+        <button class="btn btn-outline btn-sm hidden" id="changeBtn" >Ändern</button>
       </div>
     </div>
 
@@ -324,12 +324,11 @@
   </div>
 </div>
 
-<!-- Firebase -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getDatabase, ref, set, get, onValue, update, remove } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
-
-const firebaseConfig = {
+<!-- Firebase compat (global scope, fixes onclick) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({
   apiKey: "AIzaSyDz0yM2Fsb7_sxKNqi_vfPDsZmf8ZfCyck",
   authDomain: "sprint-poker-pax.firebaseapp.com",
   databaseURL: "https://sprint-poker-pax-default-rtdb.firebaseio.com",
@@ -337,12 +336,19 @@ const firebaseConfig = {
   storageBucket: "sprint-poker-pax.firebasestorage.app",
   messagingSenderId: "175982266217",
   appId: "1:175982266217:web:74e4d301e955254db05ff8"
-};
+});
+const db = firebase.database();
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+function ref(path) { return db.ref(path); }
+function dbSet(r, v) { return r.set(v); }
+function dbGet(r) { return r.get(); }
+function dbUpdate(r, v) { return r.update(v); }
+function dbRemove(r) { return r.remove(); }
+function onValue(r, cb) { r.on('value', snap => cb(snap)); return () => r.off('value'); }
 
-const FIBONACCI = [1, 2, 3, 5, 8, 13, 21, 34, '?', '∞'];
+document.addEventListener('DOMContentLoaded', function() {
+
+const FIBONACCI = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const SUITS = ['♠','♥','♦','♣'];
 
 let state = {
@@ -352,6 +358,7 @@ let state = {
   myName: null,
   myVote: null,
   voteLocked: false,
+  spectator: false,
 };
 
 let sessionRef = null;
@@ -376,7 +383,7 @@ if (sid) {
   document.getElementById('screenLanding').classList.remove('active');
   document.getElementById('screenTable').classList.add('active');
   // Check if session exists
-  get(ref(db, `sessions/${sid}`)).then(snap => {
+  dbGet(ref(`sessions/${sid}`)).then(snap => {
     if (!snap.exists()) {
       showToast('Session nicht gefunden.');
       document.getElementById('connectingDiv').innerHTML = '<p style="color:var(--text-muted)">Session nicht gefunden oder abgelaufen.</p>';
@@ -384,14 +391,12 @@ if (sid) {
     }
     document.getElementById('nameModal').classList.remove('hidden');
     document.getElementById('guestNameInput').focus();
-    document.getElementById('guestNameInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter') window.joinAsGuest();
-    });
+
   });
 }
 
 // ── Create Session ──
-window.createSession = async function() {
+async function createSession() {
   const story = document.getElementById('sessionNameInput').value.trim();
   const hostName = document.getElementById('hostNameInput').value.trim();
   if (!story) { showToast('Bitte Story-Namen eingeben.'); return; }
@@ -418,12 +423,12 @@ window.createSession = async function() {
     }
   };
 
-  await set(ref(db, `sessions/${sid}`), sessionData);
+  await dbSet(ref( `sessions/${sid}`), sessionData);
   switchToTable(sessionData);
 };
 
 // ── Join as Guest ──
-window.joinAsGuest = async function() {
+joinAsGuest = async function() {
   const name = document.getElementById('guestNameInput').value.trim();
   if (!name) { showToast('Bitte Namen eingeben.'); return; }
 
@@ -434,18 +439,18 @@ window.joinAsGuest = async function() {
   state.isHost = false;
 
   // Add player to session
-  await update(ref(db, `sessions/${sid}/players/${myId}`), {
+  await dbUpdate(ref( `sessions/${sid}/players/${myId}`), {
     name, vote: null, locked: false, isHost: false
   });
 
   document.getElementById('nameModal').classList.add('hidden');
 
-  const snap = await get(ref(db, `sessions/${sid}`));
+  const snap = await dbGet(ref( `sessions/${sid}`));
   switchToTable(snap.val());
 };
 
 // ── Join via link input ──
-window.joinViaLink = function() {
+function joinViaLink() {
   const raw = document.getElementById('joinLinkInput').value.trim();
   if (!raw) { showToast('Bitte Link eingeben.'); return; }
   try {
@@ -473,10 +478,12 @@ function switchToTable(initialData) {
     document.getElementById('inviteBox').classList.remove('hidden');
     document.getElementById('editStoryBtn').classList.remove('hidden');
     document.getElementById('hostControls').classList.remove('hidden');
+  } else {
+    document.getElementById('guestControls').classList.remove('hidden');
   }
 
   // Subscribe to realtime updates
-  sessionRef = ref(db, `sessions/${sid}`);
+  sessionRef = ref(`sessions/${sid}`);
   unsubscribe = onValue(sessionRef, (snap) => {
     if (!snap.exists()) return;
     const data = snap.val();
@@ -505,25 +512,32 @@ function renderFromData(data) {
 
   // Status bar
   const all = Object.values(players);
-  const voted = all.filter(p => p.locked).length;
-  document.getElementById('statusBar').innerHTML = `<strong>${voted}</strong> von <strong>${all.length}</strong> haben abgestimmt`;
+  const activePlayers = all.filter(p => !p.spectator);
+  const voted = activePlayers.filter(p => p.locked).length;
+  document.getElementById('statusBar').innerHTML = `<strong>${voted}</strong> von <strong>${activePlayers.length}</strong> haben abgestimmt`;
 
   // Vote area
-  if (!data.revealed) {
+  if (!data.revealed && !state.spectator) {
     document.getElementById('voteArea').classList.remove('hidden');
     document.getElementById('resultsPanel').classList.add('hidden');
     renderVoteArea();
-  } else {
+  } else if (data.revealed) {
     document.getElementById('voteArea').classList.add('hidden');
     document.getElementById('resultsPanel').classList.remove('hidden');
     renderResults(players);
+  } else {
+    // spectator, not revealed
+    document.getElementById('voteArea').classList.add('hidden');
+    document.getElementById('resultsPanel').classList.add('hidden');
   }
 
   // Host controls
   if (state.isHost) {
-    const allVoted = all.length > 0 && all.every(p => p.locked);
+    const nonSpectatorPlayers = Object.values(players).filter(p => !p.spectator);
+    const allVoted = nonSpectatorPlayers.length > 0 && nonSpectatorPlayers.every(p => p.locked);
     const revealBtn = document.getElementById('revealBtn');
     const resetBtn = document.getElementById('resetBtn');
+    const spectatorBtn = document.getElementById('spectatorBtn');
     if (data.revealed) {
       revealBtn.classList.add('hidden');
       resetBtn.classList.remove('hidden');
@@ -532,6 +546,8 @@ function renderFromData(data) {
       resetBtn.classList.add('hidden');
       revealBtn.disabled = !allVoted;
     }
+    spectatorBtn.textContent = state.spectator ? 'Mitspielen' : 'Zuschauermodus';
+    spectatorBtn.style.color = state.spectator ? 'var(--gold)' : '';
   }
 }
 
@@ -539,15 +555,21 @@ function renderFromData(data) {
 function renderPlayers(players, revealed) {
   const ring = document.getElementById('playersRing');
   const entries = Object.entries(players);
-  if (entries.length === 0) {
+  const activePlayers = entries.filter(([,p]) => !p.spectator);
+  const spectators = entries.filter(([,p]) => p.spectator);
+
+  if (activePlayers.length === 0 && spectators.length === 0) {
     ring.innerHTML = '<div style="color:var(--text-muted);font-size:13px;">Warte auf Spieler...</div>';
     return;
   }
-  ring.innerHTML = entries.map(([id, p], i) => {
+
+  ring.innerHTML = [...activePlayers, ...spectators].map(([id, p], i) => {
     const isMe = id === state.myId;
     const suit = SUITS[i % 4];
     let cardHTML = '';
-    if (revealed && p.vote !== null && p.vote !== undefined) {
+    if (p.spectator) {
+      cardHTML = `<div class="playing-card waiting" style="opacity:0.4;font-size:11px;letter-spacing:0.08em;color:var(--text-muted);display:flex;align-items:center;justify-content:center;">ZS</div>`;
+    } else if (revealed && p.vote !== null && p.vote !== undefined) {
       cardHTML = `<div class="playing-card revealed">
         <div class="corner-tl">${p.vote}<br>${suit}</div>
         <div>${p.vote}</div>
@@ -560,8 +582,9 @@ function renderPlayers(players, revealed) {
     }
     return `<div class="player-seat">
       ${cardHTML}
-      <div class="player-name">${isMe ? '🫵 ' : ''}${p.name}</div>
+      <div class="player-name">${isMe ? '' : ''}${p.name}</div>
       ${p.isHost ? '<div class="player-badge">HOST</div>' : ''}
+      ${p.spectator ? '<div class="player-badge" style="background:rgba(255,255,255,0.08);color:var(--text-muted)">ZUSCHAUER</div>' : ''}
     </div>`;
   }).join('');
 }
@@ -589,30 +612,56 @@ window.selectChip = function(val) {
   renderVoteArea();
 };
 
-window.lockVote = async function() {
+async function lockVote() {
   if (state.myVote === null || state.myVote === undefined) { showToast('Bitte eine Zahl wählen.'); return; }
   state.voteLocked = true;
-  await update(ref(db, `sessions/${state.sessionId}/players/${state.myId}`), {
+  await dbUpdate(ref( `sessions/${state.sessionId}/players/${state.myId}`), {
     vote: state.myVote, locked: true
   });
   showToast('Stimme eingelockt ✓');
 };
 
-window.changeVote = async function() {
+async function changeVote() {
   state.voteLocked = false;
-  await update(ref(db, `sessions/${state.sessionId}/players/${state.myId}`), {
+  await dbUpdate(ref( `sessions/${state.sessionId}/players/${state.myId}`), {
     vote: null, locked: false
   });
 };
 
-// ── Host: Reveal ──
-window.revealCards = async function() {
+// ── Host: Toggle Spectator ──
+async function toggleSpectator() {
+  state.spectator = !state.spectator;
+  // If switching to spectator, remove vote
+  if (state.spectator) {
+    state.myVote = null;
+    state.voteLocked = false;
+    await dbUpdate(ref( `sessions/${state.sessionId}/players/${state.myId}`), {
+      vote: null, locked: false, spectator: true
+    });
+  } else {
+    await dbUpdate(ref( `sessions/${state.sessionId}/players/${state.myId}`), {
+      spectator: false
+    });
+  }
+  // Re-render with current data
+  if (lastSnapshot) renderFromData(lastSnapshot);
+  showToast(state.spectator ? 'Zuschauermodus aktiv' : 'Du spielst wieder mit');
+};
+
+// ── Guest: Leave Session ──
+async function leaveSession() {
+  if (!confirm('Session wirklich verlassen?')) return;
+  if (unsubscribe) unsubscribe();
+  await dbRemove(ref( `sessions/${state.sessionId}/players/${state.myId}`));
+  window.location.href = window.location.pathname;
+};
+async function revealCards() {
   if (!state.isHost) return;
-  await update(ref(db, `sessions/${state.sessionId}`), { revealed: true });
+  await dbUpdate(ref( `sessions/${state.sessionId}`), { revealed: true });
 };
 
 // ── Host: Reset ──
-window.resetRound = async function() {
+async function resetRound() {
   const newStory = prompt('Story-Name für die neue Runde:', lastSnapshot?.storyName || '');
   if (newStory === null) return;
   const name = newStory.trim() || lastSnapshot?.storyName || 'Neue Story';
@@ -623,7 +672,7 @@ window.resetRound = async function() {
     resetPlayers[id] = { ...p, vote: null, locked: false };
   });
 
-  await update(ref(db, `sessions/${state.sessionId}`), {
+  await dbUpdate(ref( `sessions/${state.sessionId}`), {
     storyName: name,
     revealed: false,
     players: resetPlayers
@@ -634,15 +683,15 @@ window.resetRound = async function() {
 };
 
 // ── Edit Story ──
-window.editStory = async function() {
+async function editStory() {
   const newName = prompt('Story-Titel:', lastSnapshot?.storyName || '');
   if (!newName || !newName.trim()) return;
-  await update(ref(db, `sessions/${state.sessionId}`), { storyName: newName.trim() });
+  await dbUpdate(ref( `sessions/${state.sessionId}`), { storyName: newName.trim() });
   showToast('Story aktualisiert.');
 };
 
 // ── Copy Invite ──
-window.copyInvite = function() {
+function copyInvite() {
   const url = window.location.origin + window.location.pathname + '?s=' + state.sessionId;
   navigator.clipboard.writeText(url).then(() => {
     const btn = document.getElementById('copyBtn');
@@ -700,11 +749,27 @@ function renderResults(players) {
 // Cleanup on leave
 window.addEventListener('beforeunload', () => {
   if (unsubscribe) unsubscribe();
-  // Remove player from session on leave (optional)
   if (state.sessionId && state.myId && !state.isHost) {
-    remove(ref(db, `sessions/${state.sessionId}/players/${state.myId}`));
+    dbRemove(ref(`sessions/${state.sessionId}/players/${state.myId}`));
   }
 });
+
+// ── Event Listeners ──
+document.getElementById('createBtn').addEventListener('click', createSession);
+document.getElementById('copyBtn').addEventListener('click', copyInvite);
+document.getElementById('editStoryBtn').addEventListener('click', editStory);
+document.getElementById('revealBtn').addEventListener('click', revealCards);
+document.getElementById('resetBtn').addEventListener('click', resetRound);
+document.getElementById('spectatorBtn').addEventListener('click', toggleSpectator);
+document.getElementById('lockBtn').addEventListener('click', lockVote);
+document.getElementById('changeBtn').addEventListener('click', changeVote);
+document.getElementById('joinGuestBtn').addEventListener('click', joinAsGuest);
+document.getElementById('guestNameInput').addEventListener('keydown', e => { if (e.key === 'Enter') joinAsGuest(); });
+
+const leaveBtn = document.querySelector('#guestControls button');
+if (leaveBtn) leaveBtn.addEventListener('click', leaveSession);
+
+}); // end DOMContentLoaded
 </script>
 </body>
 </html>
