@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprint Poker - Klassisch</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<div class="modal-bg hidden" id="nameModal">
+  <div class="modal">
+    <h2>Tisch betreten</h2>
+    <p>Du wurdest eingeladen. Wie heisst du?</p>
+    <label>Dein Name</label>
+    <input type="text" id="guestNameInput" placeholder="z.B. Anna" maxlength="24">
+    <button class="btn btn-gold" id="joinGuestBtn">Am Tisch Platz nehmen</button>
+  </div>
+</div>
+
+<div class="modal-bg hidden" id="storyModal">... (Füge hier den Code für das Story Modal aus deinem Original ein) ...</div>
+<div class="modal-bg hidden" id="confirmModal">... (Füge hier den Code für das Confirm Modal aus deinem Original ein) ...</div>
+
+<div class="screen" id="screenClassicSetup">
+  <button class="btn-back" id="backFromClassic">← Zurück zur Auswahl</button>
+  <div class="classic-card">
+    <h1>Klassisch</h1>
+    <label>Story / Session Name</label>
+    <input type="text" id="classicStoryInput" placeholder="z.B. User Login implementieren" maxlength="80">
+    <label>Dein Name (Host)</label>
+    <input type="text" id="classicNameInput" placeholder="z.B. Bastian" maxlength="24">
+    <button class="btn btn-gold" id="classicCreateBtn">Session erstellen</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-database-compat.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
