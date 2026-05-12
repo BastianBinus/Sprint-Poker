@@ -79,8 +79,10 @@ if(urlSid){
 }
 
 // ── Mode selection ──
-document.getElementById('btnClassicMode').addEventListener('click',()=>showScreen('screenClassicSetup'));
-document.getElementById('btnCasinoMode').addEventListener('click',()=>showScreen('screenCasinoSetup'));
+document.getElementById('screenMode').addEventListener('click',e=>{
+  if(e.target.closest('#btnClassicMode'))showScreen('screenClassicSetup');
+  if(e.target.closest('#btnCasinoMode'))showScreen('screenCasinoSetup');
+});
 document.getElementById('backFromClassic').addEventListener('click',()=>showScreen('screenMode'));
 document.getElementById('backFromCasino').addEventListener('click',()=>showScreen('screenMode'));
 

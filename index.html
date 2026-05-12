@@ -4,8 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sprint Poker</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="universal.css">
 </head>
 <body>
 <div class="toast" id="toast"></div>
@@ -25,9 +24,9 @@
     <h2 id="storyModalTitle">Story ändern</h2>
     <p id="storyModalDesc">Neuer Story-Titel:</p>
     <input type="text" id="storyModalInput" placeholder="Story-Name..." maxlength="80">
-    <div style="display:flex;gap:10px;margin-top:4px">
-      <button class="btn btn-gold" id="storyModalOk" style="flex:1">OK</button>
-      <button class="btn btn-dark" id="storyModalCancel" style="flex:1;width:auto">Abbrechen</button>
+    <div>
+      <button class="btn btn-gold" id="storyModalOk">OK</button>
+      <button class="btn btn-dark" id="storyModalCancel">Abbrechen</button>
     </div>
   </div>
 </div>
@@ -35,37 +34,27 @@
   <div class="modal">
     <h2 id="confirmTitle">Sicher?</h2>
     <p id="confirmDesc"></p>
-    <div style="display:flex;gap:10px;margin-top:4px">
-      <button class="btn btn-danger" id="confirmOk" style="flex:1;width:auto">Ja</button>
-      <button class="btn btn-dark" id="confirmCancel" style="flex:1;width:auto">Abbrechen</button>
+    <div>
+      <button class="btn btn-danger" id="confirmOk">Ja</button>
+      <button class="btn btn-dark" id="confirmCancel">Abbrechen</button>
     </div>
   </div>
 </div>
 
 <!-- ── SCREEN: MODE SELECT ── -->
-<div class="screen active" id="screenMode">
+<div class="screen active" id="screenMode" data-screen-label="Mode Select">
   <div class="mode-screen">
     <div class="mode-suits">♠ ♥ ♦ ♣</div>
     <h1 class="mode-title">Sprint Poker</h1>
     <div class="mode-cards">
-      <div class="mode-card" id="btnClassicMode">
-        <div class="mode-icon">🃏</div>
-        <h2>Klassisch</h2>
-        <p>Einfaches Planning Poker — jeder schätzt, Host deckt auf, Auswertung mit Durchschnitt & Agreement.</p>
-        <div class="mode-badge">Standard</div>
-      </div>
-      <div class="mode-card" id="btnCasinoMode">
-        <div class="mode-icon">♠</div>
-        <h2>Casino</h2>
-        <p>Chip-Einsätze, The House als Gegner, Gewinner kriegt Bonus-Chips — Sprint Planning mit Spielcharakter.</p>
-        <div class="mode-badge">Game Mode</div>
-      </div>
+      <div class="mode-card" id="btnClassicMode"></div>
+      <div class="mode-card" id="btnCasinoMode"></div>
     </div>
   </div>
 </div>
 
 <!-- ── SCREEN: CLASSIC SETUP ── -->
-<div class="screen" id="screenClassicSetup">
+<div class="screen" id="screenClassicSetup" data-screen-label="Classic Setup">
   <button class="btn-back" id="backFromClassic">← Zurück</button>
   <div class="classic-card">
     <h1>Klassisch</h1>
@@ -78,7 +67,7 @@
 </div>
 
 <!-- ── SCREEN: CASINO SETUP ── -->
-<div class="screen" id="screenCasinoSetup">
+<div class="screen" id="screenCasinoSetup" data-screen-label="Casino Setup">
   <button class="btn-back" id="backFromCasino">← Zurück</button>
   <div class="classic-card">
     <h1>Casino</h1>
@@ -91,23 +80,23 @@
 </div>
 
 <!-- ── SCREEN: CLASSIC TABLE ── -->
-<div class="screen" id="screenClassicTable">
+<div class="screen" id="screenClassicTable" data-screen-label="Classic Table">
   <div class="connecting hidden" id="classicConnecting"><div class="spinner"></div>Verbinde...</div>
   <div id="classicTableContent" class="hidden" style="width:100%;display:flex;flex-direction:column;align-items:center;">
     <div class="invite-box hidden" id="classicInviteBox">
-      <div style="flex:1"><div style="font-size:9px;color:var(--text-muted);letter-spacing:0.1em;margin-bottom:3px">EINLADUNGSLINK</div><div class="invite-url" id="classicInviteUrl"></div></div>
+      <div style="flex:1"><div>EINLADUNGSLINK</div><div class="invite-url" id="classicInviteUrl"></div></div>
       <button class="copy-btn" id="classicCopyBtn">Kopieren</button>
     </div>
-    <div class="status-line" id="classicStatus"></div>
-    <!-- classic felt table -->
-    <div style="background:#1a4a2e;border-radius:120px;padding:36px 56px 44px;box-shadow:0 8px 60px rgba(0,0,0,0.6),inset 0 2px 8px rgba(0,0,0,0.4);border:12px solid #0d2015;outline:2px solid #9e7d30;position:relative;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:12px 0;width:100%">
-      <div style="position:absolute;inset:8px;border-radius:108px;border:1px solid rgba(201,168,76,0.1);pointer-events:none"></div>
-      <div style="font-size:10px;color:rgba(232,223,200,0.5);letter-spacing:0.18em;text-transform:uppercase;margin-bottom:5px">Aktuelle Story</div>
-      <div style="font-family:'Playfair Display',serif;font-size:22px;color:#e8c97a;text-align:center;max-width:500px;margin-bottom:20px" id="classicStoryTitle">–</div>
-      <button style="background:none;border:none;color:rgba(232,223,200,0.4);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:-12px;margin-bottom:14px;display:none" id="classicEditStoryBtn">✎ Story ändern</button>
-      <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:20px;width:100%" id="classicPlayersRing"></div>
+    <div class="status-line" id="classicStatus" style="margin: 0px 0px 24px"></div>
+    <div class="felt-table" style="background:#003d1e">
+      <div style="text-align:center;z-index:10;margin-bottom:14px">
+        <div class="story-sup">Aktuelle Story</div>
+        <div class="story-name" id="classicStoryTitle">–</div>
+        <button class="story-edit" id="classicEditStoryBtn" style="display:none">✎ Story ändern</button>
+      </div>
+      <div id="classicPlayersRing"></div>
     </div>
-    <div class="controls-row hidden" id="classicHostControls">
+    <div class="controls-row hidden" id="classicHostControls" style="margin: 24px 0px 12px">
       <button class="btn btn-gold btn-sm" id="classicRevealBtn" disabled>Karten aufdecken</button>
       <button class="btn btn-dark btn-sm hidden" id="classicResetBtn">Neue Runde</button>
       <button class="btn btn-dark btn-sm" id="classicSpectatorBtn">Zuschauen</button>
@@ -115,7 +104,7 @@
     <div class="controls-row hidden" id="classicGuestControls">
       <button class="btn btn-danger btn-sm" id="classicLeaveBtn">Session verlassen</button>
     </div>
-    <div class="vote-area hidden" id="classicVoteArea" style="border-radius:18px;padding:20px 24px 18px">
+    <div class="vote-area hidden" id="classicVoteArea">
       <div class="classic-chips" id="classicChipRow"></div>
       <div style="display:flex;gap:10px;justify-content:center">
         <button class="btn btn-gold btn-sm" id="classicLockBtn">SCHÄTZEN</button>
@@ -133,12 +122,12 @@
 </div>
 
 <!-- ── SCREEN: CASINO TABLE ── -->
-<div class="screen" id="screenCasinoTable">
-  <div class="connecting" id="casinoConnecting"><div class="spinner"></div>Verbinde...</div>
+<div class="screen" id="screenCasinoTable" data-screen-label="Casino Table">
+  <div class="connecting hidden" id="casinoConnecting"><div class="spinner"></div>Verbinde...</div>
   <div id="casinoTableContent" class="hidden" style="width:100%;display:flex;flex-direction:column;align-items:center;">
     <div class="status-line" id="casinoStatus"></div>
-    <div class="invite-box hidden" id="casinoInviteBox">
-      <div style="flex:1"><div style="font-size:9px;color:var(--text-muted);letter-spacing:0.1em;margin-bottom:3px">EINLADUNGSLINK</div><div class="invite-url" id="casinoInviteUrl"></div></div>
+    <div class="invite-box hidden" id="casinoInviteBox" style="margin: 0px 0px 2px">
+      <div style="flex:1"><div>EINLADUNGSLINK</div><div class="invite-url" id="casinoInviteUrl"></div></div>
       <button class="copy-btn" id="casinoCopyBtn">Kopieren</button>
     </div>
     <div class="felt-table" id="casinoFeltTable">
@@ -150,7 +139,7 @@
       <div class="table-center-row" id="casinoCenterRow"></div>
       <div id="casinoAvatars"></div>
     </div>
-    <div class="controls-row hidden" id="casinoHostControls">
+    <div class="controls-row hidden" id="casinoHostControls" style="margin: 24px 0px 12px">
       <button class="btn btn-gold btn-sm" id="casinoRevealBtn" disabled>Aufdecken</button>
       <button class="btn btn-dark btn-sm hidden" id="casinoResetBtn">Neue Runde</button>
       <button class="btn btn-dark btn-sm" id="casinoSpectatorBtn">Zuschauen</button>
@@ -158,7 +147,7 @@
     <div class="controls-row hidden" id="casinoGuestControls">
       <button class="btn btn-danger btn-sm" id="casinoLeaveBtn">Session verlassen</button>
     </div>
-    <div class="vote-area hidden" id="casinoVoteArea">
+    <div class="vote-area hidden" id="casinoVoteArea" style="width: 1200px">
       <div class="chips-row" id="casinoChipsRow"></div>
       <div class="lock-btn-wrap">
         <button class="btn btn-gold" id="casinoLockBtn" style="border-radius:12px">Einsetzen</button>
@@ -175,9 +164,105 @@
     </div>
   </div>
 </div>
-
 <script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-database-compat.js"></script>
 <script src="app.js"></script>
+
+<!-- Tweaks panel -->
+<style>
+  #tweaksPanel { position: fixed; bottom: 20px; right: 20px; z-index: 9999; background: #0d2b1d; border: 1px solid rgba(140,205,15,0.3); border-radius: 12px; padding: 16px 18px; min-width: 240px; box-shadow: 0 12px 40px rgba(0,0,0,0.6); font-family: Arial, Helvetica, sans-serif; color: #fff; display: none; }
+  #tweaksPanel.open { display: block; }
+  #tweaksPanel .tp-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  #tweaksPanel .tp-title { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #8ccd0f; }
+  #tweaksPanel .tp-close { background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; font-size: 16px; padding: 0 4px; }
+  #tweaksPanel .tp-close:hover { color: #8ccd0f; }
+  #tweaksPanel .tp-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; font-size: 13px; }
+  #tweaksPanel .tp-label { color: rgba(255,255,255,0.85); }
+  #tweaksPanel .tp-hint { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 6px; line-height: 1.4; }
+  .tp-switch { position: relative; width: 38px; height: 22px; flex-shrink: 0; }
+  .tp-switch input { opacity: 0; width: 0; height: 0; }
+  .tp-switch .slider { position: absolute; inset: 0; background: rgba(255,255,255,0.15); border-radius: 22px; cursor: pointer; transition: background 0.2s; }
+  .tp-switch .slider::before { content: ''; position: absolute; height: 16px; width: 16px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform 0.2s; }
+  .tp-switch input:checked + .slider { background: #8ccd0f; }
+  .tp-switch input:checked + .slider::before { transform: translateX(16px); }
+</style>
+
+<div id="tweaksPanel">
+  <div class="tp-header">
+    <div class="tp-title">Tweaks</div>
+    <button class="tp-close" id="tpClose" aria-label="Close">×</button>
+  </div>
+  <div class="tp-row">
+    <span class="tp-label">Pax style cards</span>
+    <label class="tp-switch"><input type="checkbox" id="tpPaxStyle"><span class="slider"></span></label>
+  </div>
+  <div class="tp-hint">Tauscht beide Karten im Start-Menü zwischen Felt-Look und Pax-Webseiten-Look.</div>
+</div>
+
+<script>
+(function(){
+  const TWEAKS = /*EDITMODE-BEGIN*/{
+    "paxCasinoStyle": true
+  }/*EDITMODE-END*/;
+
+  const CARDS = {
+    btnClassicMode: {
+      felt: `<div class="mode-icon">🃏</div>
+        <h2>Klassisch</h2>
+        <p>Einfaches Planning Poker — jeder schätzt, Host deckt auf, Auswertung mit Durchschnitt &amp; Agreement.</p>
+        <div class="mode-badge">Standard</div>`,
+      pax: `<div class="pax-watermark">♥</div>
+        <div class="pax-overline">Für Teams</div>
+        <h2 class="pax-title">Klassisch.</h2>
+        <p class="pax-sub">Einfaches Planning Poker — jeder schätzt, Host deckt auf, Auswertung mit Durchschnitt &amp; Agreement.</p>
+        <div class="pax-cta">Jetzt loslegen →</div>`
+    },
+    btnCasinoMode: {
+      felt: `<div class="mode-icon">♠</div>
+        <h2>Casino</h2>
+        <p>Chip-Einsätze, The House als Gegner, Gewinner kriegt Bonus-Chips — Sprint Planning mit Spielcharakter.</p>
+        <div class="mode-badge">Game Mode</div>`,
+      pax: `<div class="pax-watermark">♠</div>
+        <div class="pax-overline">Für Spieler</div>
+        <h2 class="pax-title">Casino Modus.</h2>
+        <p class="pax-sub">Chip-Einsätze, The House als Gegner, Gewinner kriegt Bonus-Chips — Sprint Planning mit Spielcharakter.</p>
+        <div class="pax-cta">Jetzt loslegen →</div>`
+    }
+  };
+
+  function apply() {
+    Object.entries(CARDS).forEach(([id, html]) => {
+      const card = document.getElementById(id);
+      if (!card) return;
+      if (TWEAKS.paxCasinoStyle) { card.classList.add('mode-card-pax'); card.innerHTML = html.pax; }
+      else { card.classList.remove('mode-card-pax'); card.innerHTML = html.felt; }
+    });
+    const cb = document.getElementById('tpPaxStyle');
+    if (cb) cb.checked = !!TWEAKS.paxCasinoStyle;
+  }
+
+  function setTweak(key, val) {
+    TWEAKS[key] = val;
+    apply();
+    try { window.parent.postMessage({type:'__edit_mode_set_keys', edits:{[key]:val}}, '*'); } catch(e){}
+  }
+
+  // Tweaks host protocol
+  window.addEventListener('message', e => {
+    const d = e.data || {};
+    if (d.type === '__activate_edit_mode') document.getElementById('tweaksPanel').classList.add('open');
+    if (d.type === '__deactivate_edit_mode') document.getElementById('tweaksPanel').classList.remove('open');
+  });
+  try { window.parent.postMessage({type:'__edit_mode_available'}, '*'); } catch(e){}
+
+  document.getElementById('tpClose').addEventListener('click', () => {
+    document.getElementById('tweaksPanel').classList.remove('open');
+    try { window.parent.postMessage({type:'__edit_mode_dismissed'}, '*'); } catch(e){}
+  });
+  document.getElementById('tpPaxStyle').addEventListener('change', e => setTweak('paxCasinoStyle', e.target.checked));
+
+  apply();
+})();
+</script>
 </body>
 </html>
