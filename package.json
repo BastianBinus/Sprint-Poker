@@ -7,7 +7,7 @@
   "author": "Bastian Binus",
   "license": "MIT",
   "scripts": {
-    "dev": "npx serve . -p 5501 --no-clipboard",
+    "dev": "npx serve src -p 5501 --no-clipboard --single",
     "lint": "npx eslint app.js",
     "deploy": "gh-pages -d ."
   },
