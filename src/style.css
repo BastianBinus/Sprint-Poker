@@ -170,10 +170,19 @@ input[type="text"]::placeholder { color: rgba(255,255,255,0.15); }
 .poker-chip-btn:hover { transform:scale(1.1) translateY(-3px); }
 .poker-chip-btn.selected { transform:scale(1.18) translateY(-14px); box-shadow:0 6px 0 rgba(0,0,0,0.4),0 0 0 4px var(--gold),0 0 0 10px rgba(8,8,8,1); z-index:20; }
 .poker-chip-btn.unsel { opacity:0.65; }
-.c1{background:#dc2626;} .c2{background:#2563eb;} .c3{background:#16a34a;}
-.c4{background:#7c3aed;} .c5{background:#ca8a04;} .c6{background:#ea580c;}
-.c7{background:#0284c7;} .c8{background:#059669;} .c9{background:#a21caf;}
-.c10{background:#27272a;} .c10 span{color:var(--gold)!important;}
+/* Fibonacci chips: 1 2 3 5 8 13 21 ☕ ? */
+.ci0{background:#dc2626;}
+.ci1{background:#2563eb;}
+.ci2{background:#16a34a;}
+.ci3{background:#7c3aed;}
+.ci4{background:#ca8a04;}
+.ci5{background:#ea580c;}
+.ci6{background:#0284c7;}
+.ci7{background:#6b3a2a;} .ci7 svg{color:#f5c89a;stroke:#f5c89a;} /* ☕ Pause */
+.ci8{background:#27272a;} .ci8 span{color:var(--gold)!important;} /* ? Nochmal */
+.poker-chip-btn svg{pointer-events:none;display:block;}
+/* Tooltip labels under special chips */
+.chip-special-label{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:8px;font-weight:700;letter-spacing:0.08em;white-space:nowrap;opacity:0.55;pointer-events:none;}
 .lock-btn-wrap { width:100%; max-width:400px; }
 
 /* Classic vote chips */
