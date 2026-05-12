@@ -1,0 +1,168 @@
+/* ════════════════════════════════════════════════
+   SPRINT POKER — VARIABLEN.CSS
+   Nur diese Datei anpassen um das Theme zu wechseln.
+   ════════════════════════════════════════════════ */
+
+:root {
+
+  /* ── PAX BRAND TOKENS ───────────────────────── */
+  --color-brand-pax-green:      #8ccd0f;
+  --color-brand-pax-purple:     #3c0078;
+  --color-brand-deep-green:     #003018;
+  --color-brand-deep-purple:    #2a0754;
+  --color-brand-contrast-green: #579e00;
+
+  /* ── NEUTRAL ────────────────────────────────── */
+  --color-neutral-black:    #121212;
+  --color-neutral-white:    #ffffff;
+  --color-neutral-gray-1:   #f5f5f5;
+  --color-neutral-gray-2:   #ededed;
+  --color-neutral-gray-3:   #d4d4d4;
+  --color-neutral-gray-4:   #adadad;
+  --color-neutral-gray-5:   #8e8e8e;
+  --color-neutral-gray-6:   #6a6a6a;
+  --color-neutral-gray-7:   #282828;
+  --color-neutral-black-50: rgba(18, 18, 18, 0.5);
+  --color-neutral-black-10: rgba(18, 18, 18, 0.1);
+  --color-neutral-white-50: rgba(255, 255, 255, 0.5);
+  --color-neutral-white-20: rgba(255, 255, 255, 0.2);
+
+  /* ── SYSTEM / FEEDBACK ──────────────────────── */
+  --color-system-error:   #ff3232;
+  --color-system-warning: #ff9600;
+  --color-system-success: #00be00;
+
+  /* ── FONTS ──────────────────────────────────── */
+  --font-primary: Arial, Helvetica, sans-serif;
+  --font-mono:    Arial, Helvetica, sans-serif;
+  --font-serif:   Arial, Helvetica, sans-serif;
+
+  --font-weight-display:   700;
+  --font-weight-heading:   700;
+  --font-weight-paragraph: 400;
+  --font-weight-overline:  500;
+  --font-weight-button:    500;
+
+  /* ── TYPOGRAFIE — GRÖSSEN ───────────────────── */
+  --size-display-s:    1.875rem;  /* 30px mobile / 52px desktop */
+  --size-heading-xl:   2rem;
+  --size-heading-l:    1.625rem;
+  --size-heading-m:    1.375rem;
+  --size-heading-s:    1.125rem;
+  --size-paragraph-l:  1.125rem;
+  --size-paragraph-m:  1rem;
+  --size-paragraph-s:  0.875rem;
+  --size-paragraph-xs: 0.75rem;
+  --size-paragraph-xxs:0.625rem;
+  --size-button:       1rem;
+
+  /* ── ABSTÄNDE ───────────────────────────────── */
+  --space-xs:  0.25rem;   /*  4px */
+  --space-s:   0.5rem;    /*  8px */
+  --space-m:   0.75rem;   /* 12px */
+  --space-l:   1rem;      /* 16px */
+  --space-xl:  1.25rem;   /* 20px */
+  --space-2xl: 1.5rem;    /* 24px */
+  --space-3xl: 2rem;      /* 32px */
+  --space-4xl: 2.5rem;    /* 40px */
+
+  /* ── BORDER RADII ───────────────────────────── */
+  --radius-sm: 0.25rem;   /*  4px */
+  --radius-m:  0.625rem;  /* 10px */
+  --radius-xl: 1rem;      /* 16px */
+
+  /* ── ÜBERGÄNGE ──────────────────────────────── */
+  --transition-fast:   0.2s ease;
+  --transition-medium: 0.3s ease;
+
+  /* ── SCHATTEN ───────────────────────────────── */
+  --shadow-card:  0 8px 32px rgba(0, 0, 0, 0.6);
+  --shadow-table: 0 8px 60px rgba(0, 0, 0, 0.7), inset 0 2px 8px rgba(0, 0, 0, 0.5);
+  --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.85);
+  --shadow-chip:  0 4px 12px rgba(0, 0, 0, 0.5);
+
+  /* ══════════════════════════════════════════════
+     SPRINT POKER THEME — hier anpassen
+     ══════════════════════════════════════════════ */
+
+  /* Hintergründe */
+  --casino-bg:   #121212;
+  --felt:        #003018;
+  --felt-light:  rgba(0, 48, 24, 0.5);
+  --felt-mid:    rgba(0, 48, 24, 0.35);
+
+  /* Text */
+  --casino-text: #ffffff;
+  --text-muted:  rgba(255, 255, 255, 0.5);
+
+  /* Akzent (Gold-Rolle übernimmt PAX Green) */
+  --gold:              #8ccd0f;
+  --gold-bg:           rgba(140, 205, 15, 0.12);
+  --gold-border:       rgba(140, 205, 15, 0.25);
+  --gold-border-light: rgba(140, 205, 15, 0.15);
+  --gold-text:         #b8e05a;
+
+  /* Tisch */
+  --table-felt:       #003d1e;
+  --table-border:     #003018;
+  --table-outline:    #8ccd0f;
+  --table-inner-ring: rgba(140, 205, 15, 0.12);
+
+  /* Input Hintergrund */
+  --input-bg:     rgba(0, 48, 24, 0.5);
+  --input-border: rgba(140, 205, 15, 0.25);
+
+  /* Avatar */
+  --avatar-bg:    rgba(0, 48, 24, 0.6);
+  --avatar-bg-me: rgba(140, 205, 15, 0.12);
+
+  /* Spielkarten */
+  --card-bg-dark:      #0d1a0d;
+  --card-bg-light:     #faf8f0;
+  --card-border-dark:  rgba(140, 205, 15, 0.2);
+  --card-border-light: #d4cdb8;
+
+  /* Status */
+  --win:    #4ade80;
+  --danger: #ff3232;
+
+  /* Chips (ci0–ci8) */
+  --chip-0-bg: #dc2626; --chip-0-border: #991b1b;
+  --chip-1-bg: #2563eb; --chip-1-border: #1e40af;
+  --chip-2-bg: #16a34a; --chip-2-border: #15803d;
+  --chip-3-bg: #7c3aed; --chip-3-border: #6d28d9;
+  --chip-4-bg: #ca8a04; --chip-4-border: #a16207;
+  --chip-5-bg: #ea580c; --chip-5-border: #c2410c;
+  --chip-6-bg: #0284c7; --chip-6-border: #0369a1;
+  --chip-7-bg: #6b3a2a; --chip-7-border: #3f2817; --chip-7-text: #f5c89a;
+  --chip-8-bg: #1a1a1a; --chip-8-border: #282828;
+
+  /* Agreement-Balken */
+  --bar-high: #4ade80;
+  --bar-mid:  #8ccd0f;
+  --bar-low:  #f59e0b;
+
+  /* Invite-Box */
+  --invite-bg:     rgba(0, 48, 24, 0.45);
+  --invite-border: rgba(140, 205, 15, 0.15);
+
+  /* Copy-Button */
+  --copy-btn-bg:    #8ccd0f;
+  --copy-btn-text:  #003018;
+  --copy-copied-bg: #4ade80;
+
+  /* Toast */
+  --toast-bg:   #8ccd0f;
+  --toast-text: #003018;
+
+  /* Logo — Einstellbar, kein Logo wenn leer */
+  --logo-display:    none;
+  --logo-position:   fixed;
+  --logo-top:        24px;
+  --logo-left:       24px;
+  --logo-right:      auto;
+  --logo-bottom:     auto;
+  --logo-width:      auto;
+  --logo-max-height: 48px;
+  --logo-z:          100;
+}
