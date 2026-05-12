@@ -2,7 +2,20 @@
 
 Planning Poker Tool für agile Teams — mit klassischem Modus und Casino-Spielmodus.
 
-Live: [bastianbinus.github.io/Sprint-Poker](https://bastianbinus.github.io/Sprint-Poker/)
+**Live:** [bastianbinus.github.io/Sprint-Poker](https://bastianbinus.github.io/Sprint-Poker/)
+
+---
+
+## Quick Start
+
+```bash
+git clone https://github.com/bastianbinus/Sprint-Poker.git
+cd Sprint-Poker
+npm install
+npm run dev
+```
+
+Öffnet einen lokalen Server auf `http://localhost:5501`.
 
 ---
 
@@ -14,69 +27,37 @@ Live: [bastianbinus.github.io/Sprint-Poker](https://bastianbinus.github.io/Sprin
 - **Sonderwerte** — ☕ Pause / ? Nochmal besprechen
 - **Echtzeit** — Mehrere Spieler gleichzeitig via Firebase Realtime Database
 - **Einladungslink** — Session per URL teilen, kein Login nötig
-
----
-
-## Tech Stack
-
-- Vanilla HTML / CSS / JavaScript
-- [Firebase Realtime Database](https://firebase.google.com/) — Echtzeit-Sync
-- [Lucide Icons](https://lucide.dev/) — Icon-Set
-- [Google Fonts](https://fonts.google.com/) — Playfair Display, DM Sans, DM Mono
-- [Pax UI](https://www.npmjs.com/package/@pax-product/pax-ui) — Design-System als Basis
-
----
-
-## Installation
-
-```bash
-git clone https://github.com/bastianbinus/Sprint-Poker.git
-cd Sprint-Poker
-npm install
-```
+- **Bot Tester** — Bis zu 4 Bots joinen und voten automatisch
 
 ---
 
 ## Scripts
 
-### Dev-Server starten
+| Script     | Befehl                      | Beschreibung                                           |
+| ---------- | --------------------------- | ------------------------------------------------------ |
+| Dev-Server | `npm run dev`               | Lokaler Server auf `http://localhost:5501`             |
+| Lint       | `npm run lint`              | Prüft `app.js` via ESLint — immer vor Deploy ausführen |
+| Deploy     | `npm run deploy`            | Pusht `src/` auf `gh-pages` Branch → Live              |
+| Bot Test   | `npm run usertest -- "URL"` | Startet 4 Bots auf einer Session                       |
+
+### Bot Tester
 
 ```bash
-npm run dev
+npm run usertest -- "http://localhost:5501/src/?s=SESSION_ID&m=casino"
 ```
 
-Öffnet einen lokalen Server auf `http://localhost:5501`.
-Hier kannst du Änderungen testen bevor du sie live stellst.
-
-### Code linten
-
-```bash
-npm run lint
-```
-
-Prüft `app.js` auf Fehler und schlechten Stil via ESLint.
-Sollte immer **0 errors** zeigen bevor du deployest.
-
-### Deployen
-
-```bash
-npm run deploy
-```
-
-Pusht die aktuellen Dateien direkt auf den `gh-pages` Branch.
-Die Seite ist danach unter der Homepage-URL live.
-⚠️ Immer zuerst auf `main` mergen und `npm run lint` ausführen.
+Die 4 Bots (Alice, Bob, Charlie, Diana) joinen die Session, wählen zufällige Fibonacci-Werte und verlassen die Session nach 30 Sekunden. Kein Browser nötig — schreibt direkt in Firebase.
 
 ---
 
 ## Workflow
 
 ```
-Entwickeln → npm run dev     (lokal testen)
-           → npm run lint    (Fehler prüfen)
-           → git commit      (Code sichern)
-           → git push        (auf GitHub)
-           → npm run deploy  (live stellen)
+Entwickeln → npm run dev        (lokal testen)
+           → npm run lint       (Fehler prüfen)
+           → git commit         (Code sichern, patch version auto-bump)
+           → git push           (auf GitHub)
+           → npm run deploy     (live stellen)
 ```
 
 ---
@@ -85,79 +66,72 @@ Entwickeln → npm run dev     (lokal testen)
 
 Das Styling besteht aus zwei Dateien:
 
-| Datei | Zweck |
-|---|---|
-| `src/variablen.css` | Alle Design-Werte als CSS-Variablen — **nur hier anpassen** |
-| `src/universal.css` | Alle Komponenten-Styles — nutzt ausschliesslich Variablen, keine hardcoded Werte |
-
-### Wie man das Design anpasst
+| Datei               | Zweck                                                                            |
+| ------------------- | -------------------------------------------------------------------------------- |
+| `src/variablen.css` | Alle Design-Werte als CSS-Variablen — **nur hier anpassen**                      |
+| `src/universal.css` | Alle Komponenten-Styles — nutzt ausschliesslich Variablen, nie direkt bearbeiten |
 
 **Nur `variablen.css` bearbeiten** — `universal.css` bleibt immer unberührt.
+
+### Wichtigste Variablen
 
 ```css
 /* src/variablen.css */
 :root {
-
   /* Markenfarben */
-  --color-brand-pax-green:      #8ccd0f;  /* Primärakzent */
-  --color-brand-pax-purple:     #3c0078;  /* Hintergrundfarbe */
-  --color-brand-deep-green:     #003018;  /* Dunkelton für Text auf Akzent */
+  --color-brand-pax-green: #8ccd0f; /* Primärakzent */
+  --color-brand-pax-purple: #3c0078; /* Hintergrundfarbe */
+  --color-brand-deep-green: #003018; /* Dunkelton */
 
   /* Fonts */
   --font-primary: Arial, Helvetica, sans-serif;
-  --font-mono:    Arial, Helvetica, sans-serif;
-  --font-serif:   Arial, Helvetica, sans-serif;
-
-  /* Abstände (Spacing Scale) */
-  --space-xs:  0.25rem;   /*  4px */
-  --space-s:   0.5rem;    /*  8px */
-  --space-m:   0.75rem;   /* 12px */
-  --space-l:   1rem;      /* 16px */
-  --space-xl:  1.25rem;   /* 20px */
-  --space-2xl: 1.5rem;    /* 24px */
 
   /* Poker-Tisch */
-  --table-felt:  #003d1e;  /* Filzfarbe */
-  --felt:        #003018;  /* Kartenhintergründe */
+  --table-felt: #003d1e; /* Filzfarbe */
+  --felt: #003018; /* Kartenhintergründe */
 
-  /* Logo (leer lassen = kein Logo) */
-  --logo-display:    none;
-  --logo-position:   fixed;
-  --logo-top:        24px;
-  --logo-left:       24px;
+  /* Logo (leer = kein Logo) */
+  --logo-display: none;
+  --logo-position: fixed;
+  --logo-top: 24px;
+  --logo-left: 24px;
   --logo-max-height: 48px;
 }
 ```
 
-### Pax UI Integration
+### Eigenes Theme (White-Labeling)
 
-Das Projekt nutzt die `@pax-product/pax-ui` Bibliothek als Design-System-Grundlage.
-Die Klassen aus Pax UI können direkt in `index.html` genutzt werden.
-`variablen.css` überschreibt dabei gezielt die Pax-Tokens für das Sprint-Poker-Theme.
+Eine neue `mein-theme.css` anlegen, dieselben Variablen überschreiben, und in `universal.css` den `@import` anpassen:
 
-> Ein eigenes Theme (z. B. für White-Labeling) erstellt man, indem man eine neue Variablen-Datei
-> anlegt und `variablen.css` im `@import` von `universal.css` ersetzt.
+```css
+/* universal.css — erste Zeile */
+@import "mein-theme.css";
+```
 
 ### Logo einbinden
 
-Das Logo wird über CSS-Variablen gesteuert — kein JS nötig:
+In `variablen.css`:
 
 ```css
-/* variablen.css */
---logo-display:    block;          /* Einblenden */
---logo-position:   fixed;
---logo-top:        24px;
---logo-left:       24px;
---logo-width:      auto;
+--logo-display: block;
+--logo-position: fixed;
+--logo-top: 24px;
+--logo-left: 24px;
 --logo-max-height: 48px;
---logo-z:          100;
 ```
 
-Dann in `index.html` das `src`-Attribut des `#site-logo`-Elements setzen:
+In `index.html`:
 
 ```html
-<img id="site-logo" src="logo.png" alt="Logo">
+<img id="site-logo" src="logo.png" alt="Logo" />
 ```
+
+---
+
+## Tech Stack
+
+- Vanilla HTML / CSS / JavaScript
+- [Firebase Realtime Database](https://firebase.google.com/) — Echtzeit-Sync
 
 ---
 
@@ -170,11 +144,8 @@ Sprint-Poker/
 │   ├── app.js              # Gesamte Logik (Firebase, Classic, Casino)
 │   ├── universal.css       # Komponenten-Styles (nicht direkt bearbeiten)
 │   └── variablen.css       # Theme-Variablen (hier das Design anpassen)
-├── .vscode/
-│   └── settings.json
-├── .gitignore
+├── test-bots.js            # Bot Tester Script
 ├── eslint.config.mjs
-├── LICENSE
 ├── package.json
 └── README.md
 ```
@@ -183,8 +154,7 @@ Sprint-Poker/
 
 ## Versioning
 
-Patch-Version wird automatisch bei jedem Commit erhöht.
-Für neue Features oder grosse Änderungen manuell:
+Patch-Version wird automatisch bei jedem Commit erhöht (via Husky pre-commit hook).
 
 ```bash
 npm version patch   # 1.0.0 → 1.0.1 (Bugfix)
