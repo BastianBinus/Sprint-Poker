@@ -228,7 +228,7 @@ body {
 .status-line .hi { font-weight: var(--font-weight-heading); color: var(--color-brand-pax-green); }
 
 /* ── FELT TABLE ── */
-.felt-table { border-radius: 140px; padding: 56px 96px 140px; box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 4px #1a0a04, 0 0 0 22px #5a2e15, 0 0 0 24px #2a1408, 0 0 0 28px #6e3a1b, 0 0 0 31px #2a1408; border: none; outline: none; position: relative; min-height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: var(--space-m) 0; width: 100%; max-width: 800px; background: var(--table-felt); }
+.felt-table { border-radius: 140px; padding: 120px 96px 140px; box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 4px #1a0a04, 0 0 0 22px #5a2e15, 0 0 0 24px #2a1408, 0 0 0 28px #6e3a1b, 0 0 0 31px #2a1408; border: none; outline: none; position: relative; min-height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: var(--space-m) 0; width: 100%; max-width: 800px; background: var(--table-felt); }
 .felt-table::before { content: ''; position: absolute; inset: 12px; border-radius: 128px; border: 1px solid var(--table-inner-ring); box-shadow: inset 0 0 0 6px rgba(0,0,0,0.18), inset 0 0 100px rgba(0,0,0,0.45); pointer-events: none; }
 .felt-table::after { display: none; }
 .story-sup { font-size: var(--size-paragraph-xxs); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 5px; color: var(--text-muted); font-weight: var(--font-weight-overline); }
