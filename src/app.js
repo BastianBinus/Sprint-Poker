@@ -387,7 +387,12 @@ function renderCasinoTable(players,revealed){
     const isMe=id===G.myId,isW=id===winnerId,chips=p.chips||START_CHIPS;
     const xPct=n===1?50:8+(84/(n-1))*i;
     const div=document.createElement('div'); div.className='player-avatar-wrap';
-    div.style.cssText=`left:${xPct}%;transform:translateX(-50%);position:absolute;bottom:18px`;
+    const angle = n===1 ? Math.PI/2 : Math.PI + (Math.PI * i/(n-1));
+    const rx=42, ry=38;
+    const cx=50, cy=50;
+    const x=cx+rx*Math.cos(angle);
+    const y=cy+ry*Math.sin(angle);
+div.style.cssText=`left:${x}%;top:${y}%;transform:translate(-50%,-50%);position:absolute;`;
     div.innerHTML=`<div class="player-avatar${isMe?' me':''}"><span class="av-i">${p.name.slice(0,2).toUpperCase()}</span><div class="av-dot${p.locked?'':' w'}"></div></div>
       <div class="av-name">${p.name}</div>
       <div class="av-chips${isW&&revealed?' win':''}">${fmt(chips)}</div>
