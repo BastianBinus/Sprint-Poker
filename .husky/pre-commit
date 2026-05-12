@@ -2,10 +2,20 @@
 node -e "
 const fs = require('fs');
 const pkg = JSON.parse(fs.readFileSync('package.json'));
-const parts = pkg.version.split('.');
-parts[2] = parseInt(parts[2]) + 1;
-pkg.version = parts.join('.');
-fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
-console.log('Version bumped to ' + pkg.version);
+const parts = pkg.version.split('.').map(Number);
+// Nur patch erhöhen wenn nicht schon von npm version geändert wurde
+const lastVersion = require('child_process').execSync('git show HEAD:package.json 2>/dev/null || echo {}').toString();
+let oldVersion = '0.0.0';
+try { oldVersion = JSON.parse(lastVersion).version || '0.0.0'; } catch(e) {}
+const oldParts = oldVersion.split('.').map(Number);
+// Wenn minor oder major schon erhöht wurde, nicht nochmal patch erhöhen
+if(parts[0] === oldParts[0] && parts[1] === oldParts[1]) {
+  parts[2] = parts[2] + 1;
+  pkg.version = parts.join('.');
+  fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+  console.log('Version bumped to ' + pkg.version);
+} else {
+  console.log('Version already bumped to ' + pkg.version);
+}
 "
 git add package.json
