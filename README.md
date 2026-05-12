@@ -97,6 +97,17 @@ Sprint-Poker/
 └── README.md
 ```
 
+## Versioning
+
+Patch-Version wird automatisch bei jedem Commit erhöht.  
+Für neue Features oder grosse Änderungen manuell:
+
+```bash
+npm version patch   # 1.0.0 → 1.0.1 (Bugfix)
+npm version minor   # 1.0.0 → 1.1.0 (Neue Funktion)
+npm version major   # 1.0.0 → 2.0.0 (Grosser Umbau)
+```
+
 ---
 
 ## License
