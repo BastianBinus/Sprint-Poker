@@ -291,15 +291,15 @@ body {
 .poker-chip-btn > * { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; line-height: 1; }
 .poker-chip-btn svg { display: block; }
 .poker-chip-btn .chip-special-label { position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; }
-.poker-chip-btn.ci0 { background: var(--chip-0-bg); border-color: var(--chip-0-border); color: var(--color-neutral-white); }
-.poker-chip-btn.ci1 { background: var(--chip-1-bg); border-color: var(--chip-1-border); color: var(--color-neutral-white); }
-.poker-chip-btn.ci2 { background: var(--chip-2-bg); border-color: var(--chip-2-border); color: var(--color-neutral-white); }
-.poker-chip-btn.ci3 { background: var(--chip-3-bg); border-color: var(--chip-3-border); color: var(--color-neutral-white); }
-.poker-chip-btn.ci4 { background: var(--chip-4-bg); border-color: var(--chip-4-border); color: var(--color-neutral-white); }
-.poker-chip-btn.ci5 { background: var(--chip-5-bg); border-color: var(--chip-5-border); color: var(--color-neutral-white); }
-.poker-chip-btn.ci6 { background: var(--chip-6-bg); border-color: var(--chip-6-border); color: var(--color-neutral-white); }
-.poker-chip-btn.ci7 { background: var(--chip-7-bg); border-color: var(--chip-7-border); color: var(--chip-7-text); }
-.poker-chip-btn.ci8 { background: var(--chip-8-bg); border-color: var(--chip-8-border); color: var(--color-brand-pax-green); }
+.poker-chip-btn.ci0,.chip-disc.ci0 { background: var(--chip-0-bg); border-color: var(--chip-0-border); color: var(--color-neutral-white); }
+.poker-chip-btn.ci1,.chip-disc.ci1 { background: var(--chip-1-bg); border-color: var(--chip-1-border); color: var(--color-neutral-white); }
+.poker-chip-btn.ci2,.chip-disc.ci2 { background: var(--chip-2-bg); border-color: var(--chip-2-border); color: var(--color-neutral-white); }
+.poker-chip-btn.ci3,.chip-disc.ci3 { background: var(--chip-3-bg); border-color: var(--chip-3-border); color: var(--color-neutral-white); }
+.poker-chip-btn.ci4,.chip-disc.ci4 { background: var(--chip-4-bg); border-color: var(--chip-4-border); color: var(--color-neutral-white); }
+.poker-chip-btn.ci5,.chip-disc.ci5 { background: var(--chip-5-bg); border-color: var(--chip-5-border); color: var(--color-neutral-white); }
+.poker-chip-btn.ci6,.chip-disc.ci6 { background: var(--chip-6-bg); border-color: var(--chip-6-border); color: var(--color-neutral-white); }
+.poker-chip-btn.ci7,.chip-disc.ci7 { background: var(--chip-7-bg); border-color: var(--chip-7-border); color: var(--chip-7-text); }
+.poker-chip-btn.ci8,.chip-disc.ci8 { background: var(--chip-8-bg); border-color: var(--chip-8-border); color: var(--color-brand-pax-green); }
 .poker-chip-btn:hover { transform: scale(1.08); box-shadow: 0 4px 12px var(--gold-bg); }
 .poker-chip-btn.selected { transform: scale(1.12); box-shadow: 0 0 0 3px var(--color-brand-pax-green); }
 .poker-chip-btn.unsel { opacity: 0.4; }
