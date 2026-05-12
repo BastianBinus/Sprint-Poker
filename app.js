@@ -350,9 +350,11 @@ function buildStack(color,revealed,vote,isMe){
   } else {
     frontContent=`<span class="cl" style="color:#f59e0b;font-size:15px">?</span>`;
   }
-  const bg=(revealed&&has)?`background:${color}`:'background:#111';
-  const bd=(revealed&&has)?'border-color:rgba(255,255,255,0.15)':'border-color:#3f3f46';
-  const chip=(cls)=>`<div class="chip-disc ${cls}" style="${bg};${bd}"><div class="ir"></div>${cls==='chip-front'?frontContent:''}</div>`;
+  const ciIdx=NUMBERS.findIndex(n=>String(n)===String(vote));
+  const ciClass=(revealed&&has&&ciIdx!==-1)?`ci${ciIdx}`:'';
+  const bg=(revealed&&has)?``:'background:#111';
+  const bd=(revealed&&has)?``:'border-color:#3f3f46';
+  const chip=(cls)=>`<div class="chip-disc ${cls} ${ciClass}" ${(revealed&&has)?'':`style="${bg};${bd}"`}><div class="ir"></div>${cls==='chip-front'?frontContent:''}</div>`;
   return `<div class="scattered-stack">${chip('chip-back-l')}${chip('chip-back-r')}${chip('chip-front')}</div>`;
 }
 
@@ -373,7 +375,7 @@ function renderCasinoTable(players,revealed){
     ?`<div class="house-card revealed" style="display:flex;align-items:center;justify-content:center"><span style="font-family:'Playfair Display',serif;font-size:32px;color:#fca5a5">${houseVal}</span></div>`
     :`<div class="house-card"><span class="q">?</span></div>`;
   const stacks=active.map(([id,p],i)=>{
-    const col=STACK_COLORS[i%STACK_COLORS.length],isMe=id===G.myId,isW=id===winnerId;
+    const voteIdx=NUMBERS.indexOf(p.vote);const col=STACK_COLORS[voteIdx!==-1?voteIdx:i%STACK_COLORS.length],isMe=id===G.myId,isW=id===winnerId;
     return `<div class="chip-stack-wrap">${buildStack(col,revealed,p.vote,isMe)}<div class="chip-name" style="${isW&&revealed?'color:var(--win)':''}">${p.name}</div></div>`;
   }).join('');
   document.getElementById('casinoCenterRow').innerHTML=`
