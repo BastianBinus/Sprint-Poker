@@ -1,6 +1,6 @@
 {
   "name": "sprint-poker",
-  "version": "1.0.0",
+  "version": "1.1.2",
   "private": true,
   "description": "Planning Poker mit Classic & Casino Mode",
   "homepage": "https://bastianbinus.github.io/Sprint-Poker/",
@@ -8,14 +8,16 @@
   "license": "MIT",
   "scripts": {
     "dev": "npx serve src -p 5501 --no-clipboard --single",
-    "lint": "npx eslint app.js",
-    "deploy": "gh-pages -d ."
+    "lint": "npx eslint src/app.js",
+    "deploy": "gh-pages -d src",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "eslint": "^10.3.0",
     "gh-pages": "^6.0.0",
     "globals": "^17.6.0",
+    "husky": "^9.1.7",
     "serve": "^14.2.0"
   },
   "engines": {

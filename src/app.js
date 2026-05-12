@@ -1,3 +1,4 @@
+/* global firebase */
 firebase.initializeApp({
   apiKey:"AIzaSyDz0yM2Fsb7_sxKNqi_vfPDsZmf8ZfCyck",
   authDomain:"sprint-poker-pax.firebaseapp.com",
