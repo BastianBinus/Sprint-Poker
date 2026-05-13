@@ -311,8 +311,10 @@ function renderClassicPlayers(players,revealed){
         : ``;
       card=`<div style="width:60px;height:84px;border-radius:8px;background:rgba(255,255,255,0.025);border:1.5px dashed rgba(201,168,76,0.15);display:flex;align-items:center;justify-content:center;position:relative"><div style="width:7px;height:7px;border-radius:50%;position:absolute;top:4px;right:4px;background:rgba(255,255,255,0.2)"></div>${emptyInner}</div>`;
     }
-    return `<div style="display:flex;flex-direction:column;align-items:center;gap:8px">
-      ${card}
+    return `<div class="player-avatar-wrap" style="display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;">
+      <div class="player-avatar${isMe?' me':''}" data-pid="${id}" style="width:60px;height:84px;border-radius:8px;position:relative;display:flex;align-items:center;justify-content:center;">
+        ${card}
+      </div>
       <div style="font-size:11px;color:rgba(232,223,200,${isMe?'0.9':'0.5'});max-width:72px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.name}</div>
       ${p.isHost?'<div style="font-size:9px;background:rgba(201,168,76,0.12);color:#c9a84c;border-radius:4px;padding:1px 5px">HOST</div>':''}
     </div>`;
