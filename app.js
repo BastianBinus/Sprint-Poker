@@ -8,6 +8,7 @@ firebase.initializeApp({
   messagingSenderId:"175982266217",
   appId:"1:175982266217:web:74e4d301e955254db05ff8"
 });
+const FIREBASE_URL = 'https://sprint-poker-pax-default-rtdb.firebaseio.com';
 const db = firebase.database();
 const dbRef    = p    => db.ref(p);
 const dbSet    = (r,v) => r.set(v);
@@ -307,6 +308,27 @@ document.getElementById('classicCreateBtn').addEventListener('click',async()=>{
   switchToClassicTable();
 });
 
+let lastDisconnectHostId = null;
+
+function setupOnDisconnect(players){
+  // Player immer entfernen bei Disconnect
+  dbRef(`sessions/${G.sessionId}/players/${G.myId}`).onDisconnect().remove();
+  if(!G.isHost) return;
+  const others=Object.entries(players||{}).filter(([id,p])=>id!==G.myId&&!p.spectator);
+  if(!others.length){ lastDisconnectHostId=null; return; }
+  const [newHostId]=others[0];
+  // Nur neu registrieren wenn sich der Nachfolger geändert hat
+  if(newHostId===lastDisconnectHostId) return;
+  lastDisconnectHostId=newHostId;
+  // Alte onDisconnect-Registrierungen canceln und neu setzen
+  dbRef(`sessions/${G.sessionId}/hostId`).onDisconnect().cancel();
+  dbRef(`sessions/${G.sessionId}/players/${newHostId}/isHost`).onDisconnect().cancel();
+  dbRef(`sessions/${G.sessionId}/players/${G.myId}/isHost`).onDisconnect().cancel();
+  dbRef(`sessions/${G.sessionId}/hostId`).onDisconnect().set(newHostId);
+  dbRef(`sessions/${G.sessionId}/players/${newHostId}/isHost`).onDisconnect().set(true);
+  dbRef(`sessions/${G.sessionId}/players/${G.myId}/isHost`).onDisconnect().set(false);
+}
+
 function switchToClassicTable(){
   showScreen('screenClassicTable');
   document.getElementById('classicConnecting').classList.add('hidden');
@@ -358,6 +380,7 @@ function renderClassic(data){
     else{rv.classList.remove('hidden');rs.classList.add('hidden');rv.disabled=!allVoted;}
     document.getElementById('classicSpectatorBtn').textContent=G.spectator?'Mitspielen':'Zuschauen';
   }
+  setupOnDisconnect(players);
 }
 
 function renderClassicPlayers(players,revealed){
@@ -552,6 +575,7 @@ function renderCasino(data){
     else{rv.classList.remove('hidden');rs.classList.add('hidden');rv.disabled=!allVoted;}
     document.getElementById('casinoSpectatorBtn').textContent=G.spectator?'Mitspielen':'Zuschauen';
   }
+  setupOnDisconnect(players);
 }
 
 function buildStack(color,revealed,vote,isMe){
@@ -768,7 +792,9 @@ document.getElementById('casinoCopyBtn').addEventListener('click',()=>{
 
 window.addEventListener('beforeunload',()=>{
   if(unsub)unsub();
-  if(G.sessionId&&G.myId&&!G.isHost) dbRemove(dbRef(`sessions/${G.sessionId}/players/${G.myId}`));
+  if(!G.sessionId||!G.myId) return;
+  // onDisconnect übernimmt das Cleanup — hier nur für Gäste als Fallback
+  if(!G.isHost) dbRemove(dbRef(`sessions/${G.sessionId}/players/${G.myId}`));
 });
 
 // ── Feature 1: Name vorausfüllen ─────────────────────────────
