@@ -33,6 +33,26 @@ const genId=()=>Math.random().toString(36).slice(2,10);
 const fmt=n=>Number(n).toLocaleString('de-CH');
 const toast=msg=>{const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);};
 
+// ── localStorage helpers ──────────────────────────────────────
+const LS_NAME = 'sprintpoker_my_name';
+const LS_HISTORY = 'sprintpoker_session_history';
+
+function lsSaveName(name) {
+  if (name) localStorage.setItem(LS_NAME, name);
+}
+function lsLoadName() {
+  return localStorage.getItem(LS_NAME) || '';
+}
+function lsSaveSession(name) {
+  if (!name) return;
+  let h = JSON.parse(localStorage.getItem(LS_HISTORY) || '[]');
+  h = [name, ...h.filter(n => n !== name)].slice(0, 10);
+  localStorage.setItem(LS_HISTORY, JSON.stringify(h));
+}
+function lsLoadSessions() {
+  return JSON.parse(localStorage.getItem(LS_HISTORY) || '[]');
+}
+
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -92,6 +112,7 @@ document.getElementById('guestNameInput').addEventListener('keydown',e=>{if(e.ke
 
 async function joinAsGuest(){
   const name=document.getElementById('guestNameInput').value.trim();
+  lsSaveName(name);
   if(!name){toast('Bitte Namen eingeben.');return;}
   const myId=genId();
   G.myId=myId; G.myName=name; G.isHost=false;
@@ -110,6 +131,8 @@ async function joinAsGuest(){
 document.getElementById('classicCreateBtn').addEventListener('click',async()=>{
   const story=document.getElementById('classicStoryInput').value.trim();
   const name=document.getElementById('classicNameInput').value.trim();
+  lsSaveName(name);    // ← neu
+  lsSaveSession(story);
   if(!story){toast('Bitte Story-Name.');return;} if(!name){toast('Bitte Namen.');return;}
   const btn=document.getElementById('classicCreateBtn'); btn.disabled=true; btn.textContent='Erstelle...';
   const sid=genId(),myId=genId();
@@ -282,6 +305,8 @@ document.getElementById('classicCopyBtn').addEventListener('click',()=>{
 document.getElementById('casinoCreateBtn').addEventListener('click',async()=>{
   const story=document.getElementById('casinoStoryInput').value.trim();
   const name=document.getElementById('casinoNameInput').value.trim();
+  lsSaveName(name);    // ← neu
+  lsSaveSession(story);
   if(!story){toast('Bitte Story-Name.');return;} if(!name){toast('Bitte Namen.');return;}
   const btn=document.getElementById('casinoCreateBtn');btn.disabled=true;btn.textContent='Erstelle...';
   const sid=genId(),myId=genId();
@@ -551,3 +576,59 @@ window.addEventListener('beforeunload',()=>{
   if(unsub)unsub();
   if(G.sessionId&&G.myId&&!G.isHost) dbRemove(dbRef(`sessions/${G.sessionId}/players/${G.myId}`));
 });
+
+// ── Feature 1: Name vorausfüllen ─────────────────────────────
+(function initSavedName() {
+  const saved = lsLoadName();
+  if (!saved) return;
+  ['classicNameInput', 'casinoNameInput', 'guestNameInput'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = saved;
+  });
+})();
+
+// ── Feature 2: Session Autocomplete ──────────────────────────
+function initAutocomplete(inputId) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'position:relative; width:100%;';
+  input.parentNode.insertBefore(wrap, input);
+  wrap.appendChild(input);
+
+  const drop = document.createElement('div');
+  drop.className = 'ac-dropdown';
+  drop.style.display = 'none';
+  wrap.appendChild(drop);
+
+  function showDrop() {
+    const history = lsLoadSessions();
+    const val = input.value.trim().toLowerCase();
+    const filtered = val
+      ? history.filter(n => n.toLowerCase().includes(val))
+      : history;
+    if (!filtered.length) { drop.style.display = 'none'; return; }
+    drop.innerHTML = filtered.map(n =>
+      `<div class="ac-dropdown-item">${n}</div>`
+    ).join('');
+    drop.style.display = 'block';
+    drop.querySelectorAll('.ac-dropdown-item').forEach((item, i) => {
+      item.addEventListener('mousedown', e => {
+        e.preventDefault();
+        input.value = filtered[i];
+        drop.style.display = 'none';
+        input.focus();
+      });
+    });
+  }
+
+  input.addEventListener('focus', showDrop);
+  input.addEventListener('input', showDrop);
+  input.addEventListener('blur', () => {
+    setTimeout(() => { drop.style.display = 'none'; }, 150);
+  });
+}
+
+initAutocomplete('classicStoryInput');
+initAutocomplete('casinoStoryInput');
