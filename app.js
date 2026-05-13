@@ -762,7 +762,7 @@ function updateClassicViewToggle() {
   const isAvatars = classicView === 'avatars';
   ['classicViewToggleBtn','classicViewToggleBtnGuest'].forEach(id => {
     const btn = document.getElementById(id);
-    if (btn) btn.textContent = isAvatars ? 'Karten' : 'Avatare';
+    if (btn) btn.textContent = isAvatars ? 'Avataren' : 'Karten';
   });
   if (lastSnap) renderClassic(lastSnap);
 }
