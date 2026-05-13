@@ -150,6 +150,7 @@ function wireSetupAvatarPicker(pickerId, nameInputId) {
 }
 wireSetupAvatarPicker('casinoAvatarPicker', 'casinoNameInput');
 wireSetupAvatarPicker('guestAvatarPicker', 'guestNameInput');
+wireSetupAvatarPicker('classicAvatarPicker', 'classicNameInput');
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -237,7 +238,7 @@ document.getElementById('classicCreateBtn').addEventListener('click',async()=>{
   G.mode='classic'; G.sessionId=sid; G.isHost=true; G.myId=myId; G.myName=name;
   await dbSet(dbRef(`sessions/${sid}`),{
     mode:'classic',storyName:story,hostId:myId,revealed:false,createdAt:Date.now(),
-    players:{[myId]:{name,vote:null,locked:false,isHost:true,spectator:false}}
+    players:{[myId]:{name,vote:null,locked:false,isHost:true,spectator:false,avatar:G.myAvatar||null}}
   });
   switchToClassicTable();
 });
@@ -744,6 +745,26 @@ function subscribeThrows() {
     });
   });
 }
+
+// ── Classic View Toggle ───────────────────────
+let classicView = localStorage.getItem('sprintpoker_classic_view') || 'cards';
+
+function updateClassicViewToggle() {
+  const isAvatars = classicView === 'avatars';
+  ['classicViewToggleBtn','classicViewToggleBtnGuest'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.textContent = isAvatars ? 'Karten' : 'Avatare';
+  });
+  if (lastSnap) renderClassic(lastSnap);
+}
+
+['classicViewToggleBtn','classicViewToggleBtnGuest'].forEach(id => {
+  document.getElementById(id)?.addEventListener('click', () => {
+    classicView = classicView === 'cards' ? 'avatars' : 'cards';
+    localStorage.setItem('sprintpoker_classic_view', classicView);
+    updateClassicViewToggle();
+  });
+});
 
 EmojiThrow.init({
   selfId: () => G.myId,
