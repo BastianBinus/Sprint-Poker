@@ -37,12 +37,19 @@ const toast=msg=>{const t=document.getElementById('toast');t.textContent=msg;t.c
 // ── localStorage helpers ──────────────────────────────────────
 const LS_NAME = 'sprintpoker_my_name';
 const LS_HISTORY = 'sprintpoker_session_history';
+const LS_AVATAR = 'sprintpoker_my_avatar';
 
 function lsSaveName(name) {
   if (name) localStorage.setItem(LS_NAME, name);
 }
 function lsLoadName() {
   return localStorage.getItem(LS_NAME) || '';
+}
+function lsSaveAvatar(av) {
+  if (av) localStorage.setItem(LS_AVATAR, av);
+}
+function lsLoadAvatar() {
+  return localStorage.getItem(LS_AVATAR) || null;
 }
 function lsSaveSession(name) {
   if (!name) return;
@@ -144,10 +151,12 @@ function wireSetupAvatarPicker(pickerId, nameInputId) {
   const nameInp = document.getElementById(nameInputId);
   const saved = lsLoadName();
   if (saved && nameInp) nameInp.value = saved;
-  const rebuild = () => buildAvatarPicker(pickerId, G.myAvatar, nameInp?.value || 'You', v => { G.myAvatar = v; });
+  const rebuild = () => buildAvatarPicker(pickerId, G.myAvatar, nameInp?.value || 'You', v => { G.myAvatar = v; lsSaveAvatar(v); });
   rebuild();
   if (nameInp) nameInp.addEventListener('input', rebuild);
 }
+const savedAv = lsLoadAvatar();
+if (savedAv) G.myAvatar = savedAv;
 wireSetupAvatarPicker('casinoAvatarPicker', 'casinoNameInput');
 wireSetupAvatarPicker('guestAvatarPicker', 'guestNameInput');
 wireSetupAvatarPicker('classicAvatarPicker', 'classicNameInput');
