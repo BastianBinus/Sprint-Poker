@@ -150,6 +150,7 @@ function wireSetupAvatarPicker(pickerId, nameInputId) {
 }
 wireSetupAvatarPicker('casinoAvatarPicker', 'casinoNameInput');
 wireSetupAvatarPicker('guestAvatarPicker', 'guestNameInput');
+wireSetupAvatarPicker('classicAvatarPicker', 'classicNameInput');
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -237,7 +238,7 @@ document.getElementById('classicCreateBtn').addEventListener('click',async()=>{
   G.mode='classic'; G.sessionId=sid; G.isHost=true; G.myId=myId; G.myName=name;
   await dbSet(dbRef(`sessions/${sid}`),{
     mode:'classic',storyName:story,hostId:myId,revealed:false,createdAt:Date.now(),
-    players:{[myId]:{name,vote:null,locked:false,isHost:true,spectator:false}}
+    players:{[myId]:{name,vote:null,locked:false,isHost:true,spectator:false,avatar:G.myAvatar||null}}
   });
   switchToClassicTable();
 });
@@ -300,12 +301,20 @@ function renderClassicPlayers(players,revealed){
       const cardInner=p.vote==='☕'?`<div style="display:flex;flex-direction:column;align-items:center;gap:2px">${COFFEE_SVG}<div style="font-size:7px;color:#92400e;font-weight:700">Pause</div></div>`:p.vote==='?'?`<div style="display:flex;flex-direction:column;align-items:center;gap:2px"><span style="font-family:'Playfair Display',serif;font-size:26px;color:#f59e0b;font-style:italic">?</span><div style="font-size:6px;color:#78716c;font-weight:700">Nochmal</div></div>`:`<div style="position:absolute;top:5px;left:7px;font-size:10px">${p.vote}<br>${suit}</div>${p.vote}<div style="position:absolute;bottom:5px;right:7px;font-size:10px;transform:rotate(180deg)">${p.vote}<br>${suit}</div>`;
       card=`<div style="width:60px;height:84px;border-radius:8px;border:1.5px solid #d4cdb8;background:#faf8f0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:#1a1a2e;position:relative;animation:flipIn 0.4s ease">${cardInner}</div>`;
     } else if(p.locked){
-      card=`<div style="width:60px;height:84px;border-radius:8px;background:#1a1a2e;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,0.025) 0px,rgba(255,255,255,0.025) 1px,transparent 1px,transparent 8px);display:flex;align-items:center;justify-content:center;position:relative"><div style="width:7px;height:7px;border-radius:50%;position:absolute;top:4px;right:4px;background:#4ade80;box-shadow:0 0 5px #4ade80"></div><span style="font-family:'Playfair Display',serif;font-size:24px;color:rgba(201,168,76,0.35)">?</span></div>`;
+      const lockedInner = classicView==='avatars'
+        ? `<div style="font-size:22px">${renderAvatarHTML(p)}</div>`
+        : `<span style="font-family:'Playfair Display',serif;font-size:24px;color:rgba(201,168,76,0.35)">?</span>`;
+      card=`<div style="width:60px;height:84px;border-radius:8px;background:#1a1a2e;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,0.025) 0px,rgba(255,255,255,0.025) 1px,transparent 1px,transparent 8px);display:flex;align-items:center;justify-content:center;position:relative"><div style="width:7px;height:7px;border-radius:50%;position:absolute;top:4px;right:4px;background:#4ade80;box-shadow:0 0 5px #4ade80"></div>${lockedInner}</div>`;
     } else {
-      card=`<div style="width:60px;height:84px;border-radius:8px;background:rgba(255,255,255,0.025);border:1.5px dashed rgba(201,168,76,0.15);display:flex;align-items:center;justify-content:center;position:relative"><div style="width:7px;height:7px;border-radius:50%;position:absolute;top:4px;right:4px;background:rgba(255,255,255,0.2)"></div></div>`;
+      const emptyInner = classicView==='avatars'
+        ? `<div style="font-size:22px;opacity:0.5">${renderAvatarHTML(p)}</div>`
+        : ``;
+      card=`<div style="width:60px;height:84px;border-radius:8px;background:rgba(255,255,255,0.025);border:1.5px dashed rgba(201,168,76,0.15);display:flex;align-items:center;justify-content:center;position:relative"><div style="width:7px;height:7px;border-radius:50%;position:absolute;top:4px;right:4px;background:rgba(255,255,255,0.2)"></div>${emptyInner}</div>`;
     }
-    return `<div style="display:flex;flex-direction:column;align-items:center;gap:8px">
-      ${card}
+    return `<div class="player-avatar-wrap" style="display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;">
+      <div class="player-avatar${isMe?' me':''}" data-pid="${id}" style="width:60px;height:84px;border-radius:8px;position:relative;display:flex;align-items:center;justify-content:center;">
+        ${card}
+      </div>
       <div style="font-size:11px;color:rgba(232,223,200,${isMe?'0.9':'0.5'});max-width:72px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.name}</div>
       ${p.isHost?'<div style="font-size:9px;background:rgba(201,168,76,0.12);color:#c9a84c;border-radius:4px;padding:1px 5px">HOST</div>':''}
     </div>`;
@@ -744,6 +753,26 @@ function subscribeThrows() {
     });
   });
 }
+
+// ── Classic View Toggle ───────────────────────
+let classicView = localStorage.getItem('sprintpoker_classic_view') || 'cards';
+
+function updateClassicViewToggle() {
+  const isAvatars = classicView === 'avatars';
+  ['classicViewToggleBtn','classicViewToggleBtnGuest'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.textContent = isAvatars ? 'Karten' : 'Avatare';
+  });
+  if (lastSnap) renderClassic(lastSnap);
+}
+
+['classicViewToggleBtn','classicViewToggleBtnGuest'].forEach(id => {
+  document.getElementById(id)?.addEventListener('click', () => {
+    classicView = classicView === 'cards' ? 'avatars' : 'cards';
+    localStorage.setItem('sprintpoker_classic_view', classicView);
+    updateClassicViewToggle();
+  });
+});
 
 EmojiThrow.init({
   selfId: () => G.myId,

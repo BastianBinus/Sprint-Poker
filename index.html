@@ -63,6 +63,7 @@
     <input type="text" id="classicStoryInput" placeholder="Sprint#42" maxlength="80" autocomplete="off">
     <label>Dein Name (Host)</label>
     <input type="text" id="classicNameInput" placeholder="z.B. Bastian" maxlength="24" autocomplete="off">
+    <div class="avatar-picker" id="classicAvatarPicker"></div>
     <button class="btn btn-gold" id="classicCreateBtn">Session erstellen</button>
   </div>
 </div>
@@ -99,11 +100,13 @@
       <div id="classicPlayersRing"></div>
     </div>
     <div class="controls-row hidden" id="classicHostControls" style="margin: 24px 0px 12px">
+      <button class="btn btn-dark btn-sm" id="classicViewToggleBtn">Avatare</button>
       <button class="btn btn-gold btn-sm" id="classicRevealBtn" disabled>Karten aufdecken</button>
       <button class="btn btn-dark btn-sm hidden" id="classicResetBtn">Neue Runde</button>
       <button class="btn btn-dark btn-sm" id="classicSpectatorBtn">Zuschauen</button>
     </div>
     <div class="controls-row hidden" id="classicGuestControls">
+      <button class="btn btn-dark btn-sm" id="classicViewToggleBtnGuest">Avatare</button>
       <button class="btn btn-danger btn-sm" id="classicLeaveBtn">Session verlassen</button>
     </div>
     <div class="vote-area hidden" id="classicVoteArea">
