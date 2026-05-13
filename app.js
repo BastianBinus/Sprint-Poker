@@ -254,6 +254,7 @@ function switchToClassicTable(){
     document.getElementById('classicHostControls').classList.remove('hidden');
   } else { document.getElementById('classicGuestControls').classList.remove('hidden'); }
   unsub=onVal(dbRef(`sessions/${G.sessionId}`),snap=>{if(!snap.exists())return;lastSnap=snap.val();renderClassic(lastSnap);});
+  subscribeThrows();
 }
 
 function renderClassic(data){
@@ -429,6 +430,7 @@ function switchToCasinoTable(){
     document.getElementById('casinoHostControls').classList.remove('hidden');
   } else {document.getElementById('casinoGuestControls').classList.remove('hidden');}
   unsub=onVal(dbRef(`sessions/${G.sessionId}`),snap=>{if(!snap.exists())return;lastSnap=snap.val();renderCasino(lastSnap);});
+  subscribeThrows();
 }
 
 function renderCasino(data){
@@ -732,3 +734,23 @@ function initAutocomplete(inputId) {
 
 initAutocomplete('classicStoryInput');
 initAutocomplete('casinoStoryInput');
+// ── Emoji Throw ───────────────────────────────
+function subscribeThrows() {
+  if (!G.sessionId) return;
+  onVal(dbRef(`throws/${G.sessionId}`), snap => {
+    const data = snap.val(); if (!data) return;
+    Object.entries(data).forEach(([tid, t]) => {
+      EmojiThrow.receive({...t, id: tid});
+    });
+  });
+}
+
+EmojiThrow.init({
+  selfId: () => G.myId,
+  broadcast: (payload) => {
+    if (!G.sessionId) return;
+    const throwId = payload.id || (genId() + '_' + Date.now());
+    dbUpdate(dbRef(`throws/${G.sessionId}/${throwId}`), payload);
+    setTimeout(() => dbRemove(dbRef(`throws/${G.sessionId}/${throwId}`)), 4000);
+  }
+});
