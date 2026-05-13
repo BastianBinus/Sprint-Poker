@@ -392,3 +392,10 @@ body {
 .player-avatar.me { cursor: pointer; }
 .player-avatar.me::after { content: '✎'; position: absolute; top: -4px; left: -4px; width: 18px; height: 18px; border-radius: 50%; background: #4ade80; color: #0d2b1d; font-size: 10px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
 .player-avatar.me:hover::after { opacity: 1; }
+
+.host-action-bar { background:#0d2b1d; border:1px solid rgba(140,205,15,0.3); border-radius:8px; padding:4px; box-shadow:0 4px 16px rgba(0,0,0,0.6); }
+.hab-btn { border:none; border-radius:6px; padding:5px 10px; font-size:11px; font-weight:700; cursor:pointer; font-family:var(--font-primary); transition:all 0.15s; }
+.hab-kick { background:rgba(255,50,50,0.15); color:#ff6b6b; }
+.hab-kick:hover { background:rgba(255,50,50,0.3); }
+.hab-host { background:rgba(140,205,15,0.12); color:#8ccd0f; }
+.hab-host:hover { background:rgba(140,205,15,0.25); }

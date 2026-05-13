@@ -145,8 +145,63 @@ function openAvatarChangeModal() {
 }
 document.addEventListener('click', e => {
   const t = e.target.closest('.player-avatar.me');
-  if (t && G.sessionId) openAvatarChangeModal();
+  if (t && G.sessionId) { openAvatarChangeModal(); return; }
+  // Bestehende Host-Bar schliessen wenn woanders geklickt
+  if (!e.target.closest('.host-action-bar') && !e.target.closest('.player-avatar[data-pid]')) {
+    document.querySelectorAll('.host-action-bar').forEach(b => b.remove());
+  }
+  const p = e.target.closest('.player-avatar[data-pid]');
+  if (p && G.isHost && G.sessionId) {
+    const pid = p.dataset.pid;
+    if (pid !== G.myId) openHostActionBar(p, pid);
+  }
 });
+function openHostActionBar(avatarEl, pid) {
+  document.querySelectorAll('.host-action-bar').forEach(b => b.remove());
+  const player = lastSnap?.players?.[pid];
+  if (!player) return;
+  const bar = document.createElement('div');
+  bar.className = 'host-action-bar';
+  bar.style.cssText = 'position:absolute;bottom:-48px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:200;white-space:nowrap;';
+  bar.innerHTML = `
+    <button class="hab-btn hab-kick">Kick</button>
+    <button class="hab-btn hab-host">Host</button>`;
+  const wrap = avatarEl.closest('.player-avatar-wrap');
+  wrap.style.position = 'relative';
+  wrap.appendChild(bar);
+  bar.querySelector('.hab-kick').addEventListener('click', async e => {
+    e.stopPropagation();
+    bar.remove();
+    const ok = await confirmModal(`${player.name} kicken?`, 'Der Spieler wird aus der Session entfernt.');
+    if (!ok) return;
+    await dbRemove(dbRef(`sessions/${G.sessionId}/players/${pid}`));
+    toast(`${player.name} wurde gekickt.`);
+  });
+  bar.querySelector('.hab-host').addEventListener('click', async e => {
+    e.stopPropagation();
+    bar.remove();
+    const ok = await confirmModal(`Host an ${player.name} übergeben?`, 'Du wirst zum normalen Spieler.');
+    if (!ok) return;
+    const upd = {};
+    upd[`players/${G.myId}/isHost`] = false;
+    upd[`players/${pid}/isHost`] = true;
+    upd['hostId'] = pid;
+    await dbUpdate(dbRef(`sessions/${G.sessionId}`), upd);
+    G.isHost = false;
+    const mode = G.mode;
+    document.getElementById(`${mode}HostControls`).classList.add('hidden');
+    document.getElementById(`${mode}GuestControls`).classList.remove('hidden');
+    if (mode === 'casino') {
+      document.getElementById('casinoInviteBox').classList.add('hidden');
+      document.getElementById('casinoEditStoryBtn').classList.add('hidden');
+    } else {
+      document.getElementById('classicInviteBox').classList.add('hidden');
+      document.getElementById('classicEditStoryBtn').style.display = 'none';
+    }
+    toast(`Host wurde an ${player.name} übergeben.`);
+  });
+}
+
 function wireSetupAvatarPicker(pickerId, nameInputId) {
   const nameInp = document.getElementById(nameInputId);
   const saved = lsLoadName();
@@ -268,6 +323,15 @@ function switchToClassicTable(){
 }
 
 function renderClassic(data){
+  if(data.hostId && data.hostId===G.myId && !G.isHost){
+    G.isHost=true;
+    document.getElementById('classicHostControls').classList.remove('hidden');
+    document.getElementById('classicGuestControls').classList.add('hidden');
+    document.getElementById('classicInviteBox').classList.remove('hidden');
+    document.getElementById('classicEditStoryBtn').style.display='block';
+    const url=window.location.origin+window.location.pathname+'?s='+G.sessionId+'&m=classic';
+    document.getElementById('classicInviteUrl').textContent=url;
+  }
   document.getElementById('classicStoryTitle').textContent=data.storyName||'–';
   const players=data.players||{}, me=players[G.myId];
   if(me){G.voteLocked=me.locked||false;if(me.vote!==null&&me.vote!==undefined)G.myVote=me.vote;}
@@ -453,6 +517,15 @@ function switchToCasinoTable(){
 }
 
 function renderCasino(data){
+  if(data.hostId && data.hostId===G.myId && !G.isHost){
+    G.isHost=true;
+    document.getElementById('casinoHostControls').classList.remove('hidden');
+    document.getElementById('casinoGuestControls').classList.add('hidden');
+    document.getElementById('casinoInviteBox').classList.remove('hidden');
+    document.getElementById('casinoEditStoryBtn').classList.remove('hidden');
+    const url=window.location.origin+window.location.pathname+'?s='+G.sessionId+'&m=casino';
+    document.getElementById('casinoInviteUrl').textContent=url;
+  }
   document.getElementById('casinoStoryTitle').textContent=data.storyName||'–';
   const players=data.players||{},me=players[G.myId];
   if(me){G.voteLocked=me.locked||false;if(me.vote!==null&&me.vote!==undefined)G.myVote=me.vote;}
