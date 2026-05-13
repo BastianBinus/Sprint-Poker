@@ -1,0 +1,287 @@
+/* ─── Tray ─── */
+.emoji-throw-tray {
+  position: absolute; top: -54px; left: 50%;
+  transform: translateX(-50%) scale(0.9);
+  display: flex; gap: 6px; padding: 8px 10px; border-radius: 28px;
+  background: rgba(0,12,5,0.95);
+  border: 1px solid rgba(140,205,15,0.35);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  z-index: 50;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.player-avatar-wrap.tray-open .emoji-throw-tray {
+  opacity: 1; pointer-events: auto;
+  transform: translateX(-50%) scale(1);
+}
+.emoji-throw-btn {
+  position: relative;
+  width: 32px; height: 32px; border-radius: 50%; border: none;
+  background: rgba(255,255,255,0.06); cursor: pointer; font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.1s, background 0.1s;
+}
+.emoji-throw-btn:hover { transform: scale(1.18); background: rgba(140,205,15,0.18); }
+.emoji-throw-btn::after {
+  content: attr(data-label);
+  position: absolute; bottom: -22px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px; color: rgba(255,255,255,0.5); white-space: nowrap;
+  opacity: 0; transition: opacity 0.15s; pointer-events: none;
+}
+.emoji-throw-btn:hover::after { opacity: 1; }
+
+/* ─── Flying projectile ─── */
+.flying-emoji {
+  position: fixed; z-index: 9999; pointer-events: none;
+  font-size: 36px; line-height: 1;
+  transition: transform 0.85s cubic-bezier(0.45, 0.2, 0.65, 0.95), opacity 0.85s ease;
+  will-change: transform, opacity;
+}
+
+/* ─── Generic fallback splat ─── */
+@keyframes splat-bounce {
+  0%   { transform: translate(-50%, -50%) scale(0.4) rotate(0); }
+  60%  { transform: translate(-50%, -50%) scale(1.45) rotate(-12deg); }
+  100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+}
+.emoji-splat {
+  position: absolute; left: 50%; top: 50%;
+  font-size: 44px; pointer-events: none; z-index: 100;
+  animation: splat-bounce 0.9s ease forwards;
+}
+
+/* ─── Hit-effect container ─── */
+.hit-fx {
+  position: absolute; inset: 0;
+  pointer-events: none; z-index: 200; overflow: visible;
+}
+
+/* ════════ 💩 POOP ════════ */
+@keyframes poop-drop {
+  0%   { transform: translate(-50%, -160%) scale(0.4) rotate(-30deg); opacity: 0; }
+  18%  { transform: translate(-50%, -50%)  scale(1.35) rotate(-8deg); opacity: 1; }
+  28%  { transform: translate(-50%, -42%)  scale(0.95) rotate(0deg);  opacity: 1; }
+  82%  { transform: translate(-50%, -42%)  scale(1) rotate(0deg);     opacity: 1; }
+  100% { transform: translate(-50%, -38%)  scale(0.95) rotate(0deg);  opacity: 0; }
+}
+.poop-splat-svg {
+  position: absolute; left: 50%; top: 50%;
+  width: 120%; height: 120%;
+  transform: translate(-50%,-50%) scale(0);
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+  animation: poop-drop 1.6s ease forwards;
+}
+@keyframes drip-fall {
+  0%, 22% { transform: translateY(0) scaleY(0.2); opacity: 0; }
+  35%     { transform: translateY(4px) scaleY(1); opacity: 0.9; }
+  100%    { transform: translateY(36px) scaleY(1.6); opacity: 0; }
+}
+.poop-drip {
+  position: absolute; bottom: -4px;
+  width: 6px; height: 14px; border-radius: 50%;
+  background: linear-gradient(180deg, #5a3a1e 0%, #3a2510 100%);
+  transform-origin: top center;
+  animation: drip-fall 1.4s ease forwards;
+}
+.poop-drip.drip-l { left: 22%; animation-delay: 0.35s; }
+.poop-drip.drip-c { left: 48%; animation-delay: 0.45s; width: 8px; height: 18px; }
+.poop-drip.drip-r { left: 70%; animation-delay: 0.40s; }
+@keyframes stink-rise {
+  0%   { transform: translateY(0) scale(0.5); opacity: 0; }
+  30%  { transform: translateY(-12px) scale(1); opacity: 0.7; }
+  100% { transform: translateY(-36px) scale(0.6); opacity: 0; }
+}
+.poop-stink {
+  position: absolute; top: -6px;
+  font-size: 18px; color: #6b8e23; font-weight: 900;
+  font-family: serif; letter-spacing: -2px;
+  animation: stink-rise 1.4s ease forwards;
+}
+.poop-stink.stink-1 { left: 30%; animation-delay: 0.4s; }
+.poop-stink.stink-2 { left: 60%; animation-delay: 0.6s; }
+
+/* ════════ 🔥 FIRE ════════ */
+.hit-fire.fire-behind {
+  position: absolute;
+  left: 50%; top: 30%;
+  width: 60px; height: 60px;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  pointer-events: none;
+}
+.hit-fire.fire-behind .fire-glow {
+  position: absolute; inset: -10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,140,0,0.7) 0%, rgba(255,80,0,0.35) 45%, transparent 70%);
+  animation: glow-pulse 0.18s infinite alternate;
+}
+@keyframes glow-pulse {
+  from { opacity: 0.7; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1.05); }
+}
+.hit-fire.fire-behind .fire-flame {
+  position: absolute;
+  left: 50%; bottom: 4px;
+  width: 44px; height: 68px;
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  filter: drop-shadow(0 0 8px rgba(255,140,0,0.9));
+}
+.hit-fire.fire-behind .fire-flame.f1 { animation: flame-dance-stand 0.22s infinite; }
+.hit-fire.fire-behind .fire-flame.f2 { left: 22%; width: 30px; height: 50px; bottom: 6px; animation: flame-dance-stand 0.28s infinite reverse; }
+.hit-fire.fire-behind .fire-flame.f3 { left: 78%; width: 32px; height: 54px; bottom: 6px; animation: flame-dance-stand 0.25s infinite 0.06s; }
+@keyframes flame-dance-stand {
+  0%, 100% { transform: translateX(-50%) scale(1, 1); }
+  25%      { transform: translateX(-50%) scale(0.9, 1.15) skewX(-3deg); }
+  50%      { transform: translateX(-50%) scale(1.05, 0.9) skewX(2deg); }
+  75%      { transform: translateX(-50%) scale(0.95, 1.05) skewX(-1deg); }
+}
+@keyframes spark-rise {
+  0%   { transform: translate(0,0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--sx,0), -50px) scale(0); opacity: 0; }
+}
+.hit-fire.fire-behind .fire-spark {
+  position: absolute; top: 8px; left: 50%;
+  width: 4px; height: 4px; border-radius: 50%;
+  background: #ffe14a; box-shadow: 0 0 6px #ff8a1a;
+  animation: spark-rise 0.9s ease-out infinite;
+}
+.hit-fire.fire-behind .fire-spark.s1 { --sx: -14px; animation-delay: 0s; }
+.hit-fire.fire-behind .fire-spark.s2 { --sx:  18px; animation-delay: 0.2s; }
+.hit-fire.fire-behind .fire-spark.s3 { --sx: -8px;  animation-delay: 0.4s; }
+.hit-fire.fire-behind .fire-spark.s4 { --sx:  10px; animation-delay: 0.6s; }
+.hit-fire.fire-behind .fire-smoke {
+  position: absolute; top: -60px; left: 50%;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(80,80,80,0.5), transparent 70%);
+  transform: translateX(-50%);
+  animation: smoke-rise 1.2s ease-out infinite;
+}
+@keyframes smoke-rise {
+  0%   { transform: translate(-50%, 16px) scale(0.5); opacity: 0; }
+  40%  { opacity: 0.7; }
+  100% { transform: translate(-50%, -16px) scale(1.6); opacity: 0; }
+}
+.is-burning {
+  box-shadow:
+    0 0 18px 6px rgba(255,140,0,0.7),
+    inset 0 -8px 12px rgba(160,40,0,0.6) !important;
+  animation: burn-shake 0.07s infinite;
+}
+@keyframes burn-shake {
+  0%   { transform: translate(0,0); }
+  25%  { transform: translate(-1px,1px); }
+  50%  { transform: translate(1px,-1px); }
+  75%  { transform: translate(-1px,-1px); }
+  100% { transform: translate(1px,1px); }
+}
+
+/* ════════ 🍅 TOMATO ════════ */
+@keyframes tomato-smash {
+  0%   { transform: translate(-50%, -50%) scale(1.2) rotate(0deg); opacity: 1; }
+  20%  { transform: translate(-50%, -45%) scale(1.4, 0.7) rotate(0deg); opacity: 1; }
+  35%  { transform: translate(-50%, -50%) scale(0.9, 1.1) rotate(2deg); opacity: 1; }
+  55%  { transform: translate(-50%, -50%) scale(1, 1) rotate(0deg); opacity: 0.95; }
+  85%  { transform: translate(-48%, 10%)  scale(0.9, 1) rotate(8deg); opacity: 0.7; }
+  100% { transform: translate(-44%, 90%)  scale(0.7, 1.1) rotate(18deg); opacity: 0; }
+}
+.tomato-svg {
+  opacity: 0;
+  position: absolute; left: 50%; top: 50%;
+  width: 100%; height: 100%;
+  transform-origin: center;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  animation: tomato-smash 2.3s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+}
+@keyframes tomato-burst-fade {
+  0%, 30% { opacity: 0; transform: translate(-50%,-50%) scale(0.3); }
+  40%     { opacity: 0.95; transform: translate(-50%,-50%) scale(1.2); }
+  60%     { opacity: 0.85; transform: translate(-50%,-30%) scale(1.1); }
+  100%    { opacity: 0; transform: translate(-50%, 60%) scale(1.3); }
+}
+.tomato-burst {
+  opacity: 0;
+  position: absolute; left: 50%; top: 50%;
+  width: 140%; height: 140%;
+  transform: translate(-50%,-50%) scale(0);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+  animation: tomato-burst-fade 2.3s ease forwards;
+}
+@keyframes tomato-drip-run {
+  0%, 38% { transform: translateY(0); opacity: 0; }
+  45%     { opacity: 1; }
+  100%    { transform: translateY(46px); opacity: 0; }
+}
+.tomato-drip {
+  opacity: 0;
+  position: absolute; top: 50%;
+  width: 5px; height: 14px;
+  border-radius: 0 0 50% 50% / 0 0 80% 80%;
+  background: linear-gradient(180deg, #d1242a 0%, #7a1014 100%);
+  animation: tomato-drip-run 2s ease forwards;
+}
+.tomato-drip.td1 { left: 24%; animation-delay: 0.5s; }
+.tomato-drip.td2 { left: 50%; animation-delay: 0.6s; width: 7px; height: 18px; }
+.tomato-drip.td3 { left: 72%; animation-delay: 0.55s; }
+@keyframes chunk-fly {
+  0%   { transform: translate(0,0) scale(1); opacity: 0; }
+  40%  { transform: translate(var(--cx,12px), var(--cy,-18px)) scale(1); opacity: 1; }
+  100% { transform: translate(calc(var(--cx,12px) * 1.6), calc(var(--cy,-18px) + 30px)) scale(0.7); opacity: 0; }
+}
+.tomato-chunk {
+  position: absolute; left: 50%; top: 50%;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #c1272d; box-shadow: 0 0 4px rgba(0,0,0,0.3);
+  animation: chunk-fly 1.6s ease forwards 0.4s;
+}
+.tomato-chunk.tc1 { --cx: -22px; --cy: -14px; }
+.tomato-chunk.tc2 { --cx:  20px; --cy: -16px; }
+
+/* ════════ 👏 APPLAUSE ════════ */
+@keyframes burst-ring {
+  0%   { transform: translate(-50%,-50%) scale(0); opacity: 1; }
+  100% { transform: translate(-50%,-50%) scale(2.2); opacity: 0; }
+}
+.clap-burst {
+  position: absolute; left: 50%; top: 50%;
+  width: 100%; height: 100%; border-radius: 50%;
+  border: 3px solid rgba(140,205,15,0.8);
+  animation: burst-ring 0.7s ease-out forwards;
+}
+@keyframes spark-fly {
+  0%   { transform: translate(-50%,-50%) scale(0); opacity: 1; }
+  60%  { transform: translate(calc(-50% + var(--dx,0)), calc(-50% + var(--dy,0))) scale(1); opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--dx,0) * 1.4), calc(-50% + var(--dy,0) * 1.4)) scale(0); opacity: 0; }
+}
+.et-spark {
+  position: absolute; left: 50%; top: 50%;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #ffd700; box-shadow: 0 0 6px #ffd700;
+  animation: spark-fly 0.9s ease-out forwards;
+}
+.et-spark.sp1 { --dx: -28px; --dy: -22px; }
+.et-spark.sp2 { --dx:  28px; --dy: -22px; background: #8ccd0f; box-shadow: 0 0 6px #8ccd0f; }
+.et-spark.sp3 { --dx: -32px; --dy:  10px; background: #fff;    box-shadow: 0 0 6px #fff; }
+.et-spark.sp4 { --dx:  32px; --dy:  10px; }
+.et-spark.sp5 { --dx:   0px; --dy: -34px; background: #8ccd0f; box-shadow: 0 0 6px #8ccd0f; }
+.et-spark.sp6 { --dx:   0px; --dy:  28px; background: #fff;    box-shadow: 0 0 6px #fff; }
+@keyframes star-twirl {
+  0%   { transform: translate(-50%,-50%) scale(0) rotate(0); opacity: 0; }
+  30%  { transform: translate(calc(-50% + var(--dx,0)), calc(-50% + var(--dy,0))) scale(1.2) rotate(180deg); opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--dx,0)), calc(-50% + var(--dy,0) - 24px)) scale(0.4) rotate(540deg); opacity: 0; }
+}
+.et-star {
+  position: absolute; left: 50%; top: 50%;
+  width: 18px; height: 18px;
+  filter: drop-shadow(0 0 4px rgba(255,215,0,0.6));
+  animation: star-twirl 1.3s ease-out forwards;
+}
+.et-star.s-a { --dx: -22px; --dy: -14px; animation-delay: 0.05s; }
+.et-star.s-b { --dx:  22px; --dy: -10px; animation-delay: 0.15s; }
+.et-star.s-c { --dx:   0px; --dy: -24px; animation-delay: 0.25s; }
+.is-cheered {
+  box-shadow:
+    0 0 14px 4px rgba(140,205,15,0.7),
+    inset 0 0 8px rgba(140,205,15,0.4) !important;
+}
