@@ -1,4 +1,4 @@
-/* global firebase */
+/* global firebase, EmojiThrow */
 firebase.initializeApp({
   apiKey:"AIzaSyDz0yM2Fsb7_sxKNqi_vfPDsZmf8ZfCyck",
   authDomain:"sprint-poker-pax.firebaseapp.com",
@@ -8,7 +8,7 @@ firebase.initializeApp({
   messagingSenderId:"175982266217",
   appId:"1:175982266217:web:74e4d301e955254db05ff8"
 });
-const FIREBASE_URL = 'https://sprint-poker-pax-default-rtdb.firebaseio.com';
+const FIREBASE_URL = 'https://sprint-poker-pax-default-rtdb.firebaseio.com'; // eslint-disable-line no-unused-vars
 const db = firebase.database();
 const dbRef    = p    => db.ref(p);
 const dbSet    = (r,v) => r.set(v);
@@ -398,14 +398,14 @@ function renderClassicPlayers(players,revealed){
       card=`<div style="width:60px;height:84px;border-radius:8px;border:1.5px solid #d4cdb8;background:#faf8f0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:#1a1a2e;position:relative;animation:flipIn 0.4s ease">${cardInner}</div>`;
     } else if(p.locked){
       const lockedInner = classicView==='avatars'
-      ? `<div style="position:relative;width:60px;height:84px;">${renderAvatarHTML(p)}<div style="width:7px;height:7px;border-radius:50%;position:absolute;top:4px;right:4px;background:#4ade80;box-shadow:0 0 5px #4ade80"></div></div>`
+      ? `<div style="position:relative;width:60px;height:84px;display:flex;align-items:center;justify-content:center;font-size:32px;">${renderAvatarHTML(p)}<div style="width:7px;height:7px;border-radius:50%;position:absolute;top:4px;right:4px;background:#4ade80;box-shadow:0 0 5px #4ade80"></div></div>`
       : `<span style="font-family:'Playfair Display',serif;font-size:24px;color:rgba(201,168,76,0.35)">?</span>`;
       card = classicView==='avatars'
   ? lockedInner
   : `<div style="width:60px;height:84px;border-radius:8px;background:#1a1a2e;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,0.025) 0px,rgba(255,255,255,0.025) 1px,transparent 1px,transparent 8px);display:flex;align-items:center;justify-content:center;position:relative"><div style="width:7px;height:7px;border-radius:50%;position:absolute;top:4px;right:4px;background:#4ade80;box-shadow:0 0 5px #4ade80"></div><span style="font-family:'Playfair Display',serif;font-size:24px;color:rgba(201,168,76,0.35)">?</span></div>`;
     } else {
       const emptyInner = classicView==='avatars'
-        ? `<div style="font-size:22px;opacity:0.5">${renderAvatarHTML(p)}</div>`
+        ? `<div style="font-size:32px;opacity:0.5;display:flex;align-items:center;justify-content:center;width:100%;height:100%">${renderAvatarHTML(p)}</div>`
         : ``;
       card=`<div style="width:60px;height:84px;border-radius:8px;background:rgba(255,255,255,0.025);border:1.5px dashed rgba(201,168,76,0.15);display:flex;align-items:center;justify-content:center;position:relative"><div style="width:7px;height:7px;border-radius:50%;position:absolute;top:4px;right:4px;background:rgba(255,255,255,0.2)"></div>${emptyInner}</div>`;
     }
@@ -629,6 +629,7 @@ function renderCasinoTable(players,revealed){
   const cont=document.getElementById('casinoAvatars'); cont.innerHTML='';
   allSeats.forEach(([id,p],i)=>{
     const isMe=id===G.myId,isW=id===winnerId,chips=p.chips||START_CHIPS;
+    // eslint-disable-next-line no-unused-vars
     const xPct=n===1?50:8+(84/(n-1))*i;
     const div=document.createElement('div'); div.className='player-avatar-wrap';
     const angle = n===1 ? Math.PI/2 : Math.PI + (Math.PI * i/(n-1));
