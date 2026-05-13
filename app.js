@@ -615,15 +615,14 @@ function renderCasinoTable(players,revealed){
   }
   const allActive=active.map(([,p])=>p);
   const COFFEE_SVG_LG=`<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#f5c89a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v2"/><path d="M14 2v2"/><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1z"/><path d="M16 13a4 4 0 0 0 0-8h-1"/></svg>`;
-  const allCoffee=allActive.length>0&&allActive.every(p=>p.vote==='☕');
-  const allQuestion=allActive.length>0&&allActive.every(p=>p.vote==='?');
-  const mixedSpecial=houseVal===null&&allActive.some(p=>p.vote==='☕'||p.vote==='?');
-  const houseDisplay=allCoffee
+  const hasCoffee=allActive.some(p=>p.vote==='☕');
+  const hasQuestion=allActive.some(p=>p.vote==='?');
+  const houseDisplay=hasCoffee&&hasQuestion
+    ?`<div style="display:flex;gap:6px;align-items:center">${COFFEE_SVG_LG}<span style="font-family:'Playfair Display',serif;font-size:28px;color:#f59e0b">?</span></div>`
+    :hasCoffee
     ?COFFEE_SVG_LG
-    :allQuestion
+    :hasQuestion
     ?`<span style="font-family:'Playfair Display',serif;font-size:32px;color:#f59e0b">?</span>`
-    :mixedSpecial
-    ?`<span style="font-size:20px">☕ / ?</span>`
     :`<span style="font-family:'Playfair Display',serif;font-size:32px;color:#fca5a5">${houseVal}</span>`;
   const houseHTML=revealed
     ?`<div class="house-card revealed" style="display:flex;align-items:center;justify-content:center">${houseDisplay}</div>`
