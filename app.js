@@ -1,4 +1,4 @@
-/* global firebase, EmojiThrow */
+/* global firebase */
 firebase.initializeApp({
   apiKey:"AIzaSyDz0yM2Fsb7_sxKNqi_vfPDsZmf8ZfCyck",
   authDomain:"sprint-poker-pax.firebaseapp.com",
@@ -8,7 +8,7 @@ firebase.initializeApp({
   messagingSenderId:"175982266217",
   appId:"1:175982266217:web:74e4d301e955254db05ff8"
 });
-const FIREBASE_URL = 'https://sprint-poker-pax-default-rtdb.firebaseio.com'; // eslint-disable-line no-unused-vars
+const FIREBASE_URL = 'https://sprint-poker-pax-default-rtdb.firebaseio.com';
 const db = firebase.database();
 const dbRef    = p    => db.ref(p);
 const dbSet    = (r,v) => r.set(v);
@@ -613,8 +613,20 @@ function renderCasinoTable(players,revealed){
       active.forEach(([id,p])=>{const d=Math.abs(parseFloat(p.vote)-houseVal);if(d<md){md=d;winnerId=id;}});
     }
   }
+  const allActive=active.map(([,p])=>p);
+  const COFFEE_SVG_LG=`<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#f5c89a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v2"/><path d="M14 2v2"/><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1z"/><path d="M16 13a4 4 0 0 0 0-8h-1"/></svg>`;
+  const allCoffee=allActive.length>0&&allActive.every(p=>p.vote==='☕');
+  const allQuestion=allActive.length>0&&allActive.every(p=>p.vote==='?');
+  const mixedSpecial=houseVal===null&&allActive.some(p=>p.vote==='☕'||p.vote==='?');
+  const houseDisplay=allCoffee
+    ?COFFEE_SVG_LG
+    :allQuestion
+    ?`<span style="font-family:'Playfair Display',serif;font-size:32px;color:#f59e0b">?</span>`
+    :mixedSpecial
+    ?`<span style="font-size:20px">☕ / ?</span>`
+    :`<span style="font-family:'Playfair Display',serif;font-size:32px;color:#fca5a5">${houseVal}</span>`;
   const houseHTML=revealed
-    ?`<div class="house-card revealed" style="display:flex;align-items:center;justify-content:center"><span style="font-family:'Playfair Display',serif;font-size:32px;color:#fca5a5">${houseVal}</span></div>`
+    ?`<div class="house-card revealed" style="display:flex;align-items:center;justify-content:center">${houseDisplay}</div>`
     :`<div class="house-card"><span class="q">?</span></div>`;
   const stacks=active.map(([id,p],i)=>{
     const voteIdx=NUMBERS.indexOf(p.vote);const col=STACK_COLORS[voteIdx!==-1?voteIdx:i%STACK_COLORS.length],isMe=id===G.myId,isW=id===winnerId;
@@ -629,7 +641,6 @@ function renderCasinoTable(players,revealed){
   const cont=document.getElementById('casinoAvatars'); cont.innerHTML='';
   allSeats.forEach(([id,p],i)=>{
     const isMe=id===G.myId,isW=id===winnerId,chips=p.chips||START_CHIPS;
-    // eslint-disable-next-line no-unused-vars
     const xPct=n===1?50:8+(84/(n-1))*i;
     const div=document.createElement('div'); div.className='player-avatar-wrap';
     const angle = n===1 ? Math.PI/2 : Math.PI + (Math.PI * i/(n-1));
