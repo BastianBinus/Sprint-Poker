@@ -166,3 +166,9 @@
   --logo-max-height: 48px;
   --logo-z:          100;
 }
+
+/* ── AVATAR EMOJIS ─────────────────────────────
+   Emojis werden in app.js gesetzt dafür
+   wird die Variable AVATAR_EMOJIS verwendet:
+   const AVATAR_EMOJIS=['😀','🤡','🤯','😏','😬','😩','😎','🤠','🥸','🔥','🫡','🫣','😅','🤔','💀','💩'];
+   ─────────────────────────────────────────────── */

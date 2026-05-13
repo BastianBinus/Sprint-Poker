@@ -15,7 +15,8 @@
     <h2>Tisch betreten</h2>
     <p>Du wurdest eingeladen. Wie heisst du?</p>
     <label>Dein Name</label>
-    <input type="text" id="guestNameInput" placeholder="z.B. Anna" maxlength="24">
+    <input type="text" id="guestNameInput" placeholder="z.B. Anna" maxlength="24" autocomplete="off">
+    <div class="avatar-picker" id="guestAvatarPicker"></div>
     <button class="btn btn-gold" id="joinGuestBtn">Am Tisch Platz nehmen</button>
   </div>
 </div>
@@ -59,9 +60,9 @@
   <div class="classic-card">
     <h1>Klassisch</h1>
     <label>Story / Session Name</label>
-    <input type="text" id="classicStoryInput" placeholder="z.B. User Login implementieren" maxlength="80">
+    <input type="text" id="classicStoryInput" placeholder="Matthias" maxlength="80" autocomplete="off">
     <label>Dein Name (Host)</label>
-    <input type="text" id="classicNameInput" placeholder="z.B. Bastian" maxlength="24">
+    <input type="text" id="classicNameInput" placeholder="z.B. Bastian" maxlength="24" autocomplete="off">
     <button class="btn btn-gold" id="classicCreateBtn">Session erstellen</button>
   </div>
 </div>
@@ -72,9 +73,10 @@
   <div class="classic-card">
     <h1>Casino</h1>
     <label>Story / Session Name</label>
-    <input type="text" id="casinoStoryInput" placeholder="z.B. User Login implementieren" maxlength="80">
+    <input type="text" id="casinoStoryInput" placeholder="z.B. User Login implementieren" maxlength="80" autocomplete="off">
     <label>Dein Name (Host)</label>
-    <input type="text" id="casinoNameInput" placeholder="z.B. Bastian" maxlength="24">
+    <input type="text" id="casinoNameInput" placeholder="z.B. Bastian" maxlength="24" autocomplete="off">
+    <div class="avatar-picker" id="casinoAvatarPicker"></div>
     <button class="btn btn-gold" id="casinoCreateBtn">Session erstellen</button>
   </div>
 </div>
@@ -264,5 +266,16 @@
   apply();
 })();
 </script>
+<div class="modal-bg hidden" id="avatarModal">
+  <div class="modal-card">
+    <h2>Avatar ändern</h2>
+    <div class="avatar-picker" id="modalAvatarPicker"></div>
+    <div class="modal-actions">
+      <button class="btn btn-gold" id="avatarModalOk">Übernehmen</button>
+      <button class="btn btn-dark" id="avatarModalCancel">Abbrechen</button>
+    </div>
+  </div>
+</div>
+<input type="file" id="avatarFileInput" accept="image/*" style="display:none">
 </body>
 </html>

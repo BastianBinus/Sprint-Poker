@@ -24,14 +24,132 @@ const STACK_COLORS=['#dc2626','#2563eb','#16a34a','#7c3aed','#ca8a04','#ea580c',
 // Lucide coffee icon (inline SVG)
 const COFFEE_SVG=`<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f5c89a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v2"/><path d="M14 2v2"/><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1z"/><path d="M16 13a4 4 0 0 0 0-8h-1"/></svg>`;
 const START_CHIPS=1000, BONUS_CHIPS=200;
-
+// Avatar Emojis
+const AVATAR_EMOJIS=['😀','🤡','🤯','😏','😬','😩','😎','🤠','🥸','🔥','🫡','🫣','😅','🤔','💀','💩'];
 // Shared state — one active game at a time
-let G = { mode:null, sessionId:null, isHost:false, myId:null, myName:null, myVote:null, voteLocked:false, spectator:false };
+let G = { mode:null, sessionId:null, isHost:false, myId:null, myName:null, myVote:null, voteLocked:false, spectator:false, myAvatar:null };
 let unsub=null, lastSnap=null;
 
 const genId=()=>Math.random().toString(36).slice(2,10);
 const fmt=n=>Number(n).toLocaleString('de-CH');
 const toast=msg=>{const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);};
+
+// ── localStorage helpers ──────────────────────────────────────
+const LS_NAME = 'sprintpoker_my_name';
+const LS_HISTORY = 'sprintpoker_session_history';
+
+function lsSaveName(name) {
+  if (name) localStorage.setItem(LS_NAME, name);
+}
+function lsLoadName() {
+  return localStorage.getItem(LS_NAME) || '';
+}
+function lsSaveSession(name) {
+  if (!name) return;
+  let h = JSON.parse(localStorage.getItem(LS_HISTORY) || '[]');
+  h = [name, ...h.filter(n => n !== name)].slice(0, 10);
+  localStorage.setItem(LS_HISTORY, JSON.stringify(h));
+}
+function lsLoadSessions() {
+  return JSON.parse(localStorage.getItem(LS_HISTORY) || '[]');
+}
+// ── Avatar helpers ──
+function renderAvatarHTML(p) {
+  const av = p.avatar;
+  if (!av) return `<span class="av-i">${(p.name||'?').slice(0,2).toUpperCase()}</span>`;
+  if (typeof av === 'string' && av.startsWith('data:')) return `<img src="${av}" alt="">`;
+  if (typeof av === 'string' && av.startsWith('initials:')) return `<span class="av-i">${av.slice(9).slice(0,2).toUpperCase()}</span>`;
+  return `<span class="av-emoji">${av}</span>`;
+}
+function renderAvatarSwatch(av, name) {
+  if (!av) return `<span>${(name||'?').slice(0,2).toUpperCase()}</span>`;
+  if (typeof av === 'string' && av.startsWith('data:')) return `<img src="${av}" alt="">`;
+  if (typeof av === 'string' && av.startsWith('initials:')) return `<span>${av.slice(9).slice(0,2).toUpperCase()}</span>`;
+  return av;
+}
+function buildAvatarPicker(containerId, currentAv, nameForInitials, onChange) {
+  const cont = document.getElementById(containerId);
+  if (!cont) return;
+  const initialsAv = `initials:${(nameForInitials||'You')}`;
+  const opts = [initialsAv, ...AVATAR_EMOJIS];
+  let html = opts.map(av => {
+    const sel = String(av)===String(currentAv);
+    const cls = av.startsWith('initials:') ? ' initials' : '';
+    return `<div class="avatar-opt${cls}${sel?' selected':''}" data-av="${av.replace(/"/g,'&quot;')}">${renderAvatarSwatch(av, nameForInitials)}</div>`;
+  }).join('');
+  if (currentAv && typeof currentAv==='string' && currentAv.startsWith('data:')) {
+    html = `<div class="avatar-opt selected" data-av="${currentAv}"><img src="${currentAv}" alt=""></div>` + html;
+  }
+  html += `<div class="avatar-opt upload" data-upload="1" title="Bild hochladen">↑</div>`;
+  cont.innerHTML = html;
+  cont.querySelectorAll('.avatar-opt').forEach(el => {
+    el.addEventListener('click', () => {
+      if (el.dataset.upload) {
+        const inp = document.getElementById('avatarFileInput');
+        inp.onchange = ev => {
+          const f = ev.target.files && ev.target.files[0]; if (!f) return;
+          const reader = new FileReader();
+          reader.onload = () => {
+            const img = new Image();
+            img.onload = () => {
+              const c = document.createElement('canvas'); c.width=96; c.height=96;
+              const ctx = c.getContext('2d');
+              const s = Math.min(img.width, img.height);
+              const sx = (img.width-s)/2, sy = (img.height-s)/2;
+              ctx.drawImage(img, sx, sy, s, s, 0, 0, 96, 96);
+              const out = c.toDataURL('image/jpeg', 0.82);
+              onChange(out);
+              buildAvatarPicker(containerId, out, nameForInitials, onChange);
+            };
+            img.src = reader.result;
+          };
+          reader.readAsDataURL(f);
+          inp.value='';
+        };
+        inp.click();
+        return;
+      }
+      const v = el.dataset.av;
+      cont.querySelectorAll('.avatar-opt').forEach(x=>x.classList.remove('selected'));
+      el.classList.add('selected');
+      onChange(v);
+    });
+  });
+}
+
+function openAvatarChangeModal() {
+  const me = lastSnap?.players?.[G.myId];
+  let chosen = me?.avatar || G.myAvatar;
+  buildAvatarPicker('modalAvatarPicker', chosen, G.myName, v => { chosen = v; });
+  document.getElementById('avatarModal').classList.remove('hidden');
+  const ok = document.getElementById('avatarModalOk');
+  const cn = document.getElementById('avatarModalCancel');
+  const close = (apply) => {
+    document.getElementById('avatarModal').classList.add('hidden');
+    document.getElementById('avatarModalOk').replaceWith(ok.cloneNode(true));
+    document.getElementById('avatarModalCancel').replaceWith(cn.cloneNode(true));
+    if (apply) {
+      G.myAvatar = chosen;
+      dbUpdate(dbRef(`sessions/${G.sessionId}/players/${G.myId}`), {avatar: chosen});
+    }
+  };
+  document.getElementById('avatarModalOk').addEventListener('click', ()=>close(true));
+  document.getElementById('avatarModalCancel').addEventListener('click', ()=>close(false));
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('.player-avatar.me');
+  if (t && G.sessionId) openAvatarChangeModal();
+});
+function wireSetupAvatarPicker(pickerId, nameInputId) {
+  const nameInp = document.getElementById(nameInputId);
+  const saved = lsLoadName();
+  if (saved && nameInp) nameInp.value = saved;
+  const rebuild = () => buildAvatarPicker(pickerId, G.myAvatar, nameInp?.value || 'You', v => { G.myAvatar = v; });
+  rebuild();
+  if (nameInp) nameInp.addEventListener('input', rebuild);
+}
+wireSetupAvatarPicker('casinoAvatarPicker', 'casinoNameInput');
+wireSetupAvatarPicker('guestAvatarPicker', 'guestNameInput');
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -92,11 +210,12 @@ document.getElementById('guestNameInput').addEventListener('keydown',e=>{if(e.ke
 
 async function joinAsGuest(){
   const name=document.getElementById('guestNameInput').value.trim();
+  lsSaveName(name);
   if(!name){toast('Bitte Namen eingeben.');return;}
   const myId=genId();
   G.myId=myId; G.myName=name; G.isHost=false;
   const chips = G.mode==='casino' ? START_CHIPS : undefined;
-  const playerData={name,vote:null,locked:false,isHost:false,spectator:false};
+  const playerData={name,vote:null,locked:false,isHost:false,spectator:false,avatar:G.myAvatar||null};
   if(chips!==undefined) playerData.chips=chips;
   await dbUpdate(dbRef(`sessions/${G.sessionId}/players/${myId}`),playerData);
   document.getElementById('nameModal').classList.add('hidden');
@@ -110,6 +229,8 @@ async function joinAsGuest(){
 document.getElementById('classicCreateBtn').addEventListener('click',async()=>{
   const story=document.getElementById('classicStoryInput').value.trim();
   const name=document.getElementById('classicNameInput').value.trim();
+  lsSaveName(name);    // ← neu
+  lsSaveSession(story);
   if(!story){toast('Bitte Story-Name.');return;} if(!name){toast('Bitte Namen.');return;}
   const btn=document.getElementById('classicCreateBtn'); btn.disabled=true; btn.textContent='Erstelle...';
   const sid=genId(),myId=genId();
@@ -282,13 +403,16 @@ document.getElementById('classicCopyBtn').addEventListener('click',()=>{
 document.getElementById('casinoCreateBtn').addEventListener('click',async()=>{
   const story=document.getElementById('casinoStoryInput').value.trim();
   const name=document.getElementById('casinoNameInput').value.trim();
+  
+  lsSaveName(name);    // ← neu
+  lsSaveSession(story);
   if(!story){toast('Bitte Story-Name.');return;} if(!name){toast('Bitte Namen.');return;}
   const btn=document.getElementById('casinoCreateBtn');btn.disabled=true;btn.textContent='Erstelle...';
   const sid=genId(),myId=genId();
   G.mode='casino';G.sessionId=sid;G.isHost=true;G.myId=myId;G.myName=name;
   await dbSet(dbRef(`sessions/${sid}`),{
     mode:'casino',storyName:story,hostId:myId,revealed:false,createdAt:Date.now(),
-    players:{[myId]:{name,vote:null,locked:false,isHost:true,spectator:false,chips:START_CHIPS}}
+    players:{[myId]:{name,vote:null,locked:false,isHost:true,spectator:false,chips:START_CHIPS,avatar:G.myAvatar||null}}
   });
   switchToCasinoTable();
 });
@@ -395,7 +519,8 @@ function renderCasinoTable(players,revealed){
     const x=cx+rx*Math.cos(angle);
     const y=cy+ry*Math.sin(angle);
 div.style.cssText=`left:${x}%;top:${y}%;transform:translate(-50%,-50%);position:absolute;`;
-    div.innerHTML=`<div class="player-avatar${isMe?' me':''}"><span class="av-i">${p.name.slice(0,2).toUpperCase()}</span><div class="av-dot${p.locked?'':' w'}"></div></div>
+    const avHTML = renderAvatarHTML(p);
+    div.innerHTML=`<div class="player-avatar${isMe?' me':''}" data-pid="${id}" title="${isMe?'Klick: Avatar ändern':''}">${avHTML}<div class="av-dot${p.locked?' w':''}"></div></div>
       <div class="av-name">${p.name}</div>
       <div class="av-chips${isW&&revealed?' win':''}">${fmt(chips)}</div>
       ${p.isHost?'<div class="av-badge">Host</div>':''}
@@ -551,3 +676,59 @@ window.addEventListener('beforeunload',()=>{
   if(unsub)unsub();
   if(G.sessionId&&G.myId&&!G.isHost) dbRemove(dbRef(`sessions/${G.sessionId}/players/${G.myId}`));
 });
+
+// ── Feature 1: Name vorausfüllen ─────────────────────────────
+(function initSavedName() {
+  const saved = lsLoadName();
+  if (!saved) return;
+  ['classicNameInput', 'casinoNameInput', 'guestNameInput'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = saved;
+  });
+})();
+
+// ── Feature 2: Session Autocomplete ──────────────────────────
+function initAutocomplete(inputId) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'position:relative; width:100%;';
+  input.parentNode.insertBefore(wrap, input);
+  wrap.appendChild(input);
+
+  const drop = document.createElement('div');
+  drop.className = 'ac-dropdown';
+  drop.style.display = 'none';
+  wrap.appendChild(drop);
+
+  function showDrop() {
+    const history = lsLoadSessions();
+    const val = input.value.trim().toLowerCase();
+    const filtered = val
+      ? history.filter(n => n.toLowerCase().includes(val))
+      : history;
+    if (!filtered.length) { drop.style.display = 'none'; return; }
+    drop.innerHTML = filtered.map(n =>
+      `<div class="ac-dropdown-item">${n}</div>`
+    ).join('');
+    drop.style.display = 'block';
+    drop.querySelectorAll('.ac-dropdown-item').forEach((item, i) => {
+      item.addEventListener('mousedown', e => {
+        e.preventDefault();
+        input.value = filtered[i];
+        drop.style.display = 'none';
+        input.focus();
+      });
+    });
+  }
+
+  input.addEventListener('focus', showDrop);
+  input.addEventListener('input', showDrop);
+  input.addEventListener('blur', () => {
+    setTimeout(() => { drop.style.display = 'none'; }, 150);
+  });
+}
+
+initAutocomplete('classicStoryInput');
+initAutocomplete('casinoStoryInput');
