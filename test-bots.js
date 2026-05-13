@@ -15,7 +15,8 @@ const MODE = params.get('m') || 'casino';
 if (!SESSION_ID) { console.error('Keine Session ID in URL gefunden'); process.exit(1); }
 
 const BOT_NAMES = ['Alice', 'Bob', 'Charlie', 'Diana'];
-const VOTES = ['1', '2', '3', '5', '8', '13', '21'];
+const VOTES = ['1', '2', '3', '5', '8', '13', '21', '☕', '?'];
+const AVATAR_EMOJIS = ['🎲','🃏','♠️','♥️','♦️','♣️','👑','🤠','🎯','🔥','⭐','🦄','🐱','🐶','🦊','🐼'];
 const START_CHIPS = 1000;
 
 function genId() { return Math.random().toString(36).slice(2, 10); }
@@ -56,16 +57,15 @@ async function checkSession() {
 async function runBot(name, index) {
   const myId = genId();
   const vote = randomVote();
-
   const playerData = {
-    name,
-    vote: null,
-    locked: false,
-    isHost: false,
-    spectator: false,
-    ...(MODE === 'casino' ? { chips: START_CHIPS } : {})
-  };
-
+  name,
+  vote: null,
+  locked: false,
+  isHost: false,
+  spectator: false,
+  avatar: AVATAR_EMOJIS[Math.floor(Math.random() * AVATAR_EMOJIS.length)],
+  ...(MODE === 'casino' ? { chips: START_CHIPS } : {})
+};
   await firebaseRequest('PATCH', `/sessions/${SESSION_ID}/players/${myId}`, playerData);
   console.log(`[${name}] Beigetreten`);
 
