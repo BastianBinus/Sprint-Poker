@@ -380,3 +380,16 @@ body {
   .classic-card { padding: 28px var(--space-xl); }
   .modal { padding: var(--space-2xl) var(--space-xl); }
 }
+/* ── Avatar ── */
+.avatar-picker { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 16px; align-items: center; }
+.avatar-opt { width: 44px; height: 44px; border-radius: 50%; border: 2px solid rgba(201,168,76,0.3); background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; font-size: 22px; line-height: 1; flex-shrink: 0; overflow: hidden; position: relative; color: #4ade80; font-weight: 700; }
+.avatar-opt:hover { transform: scale(1.08); border-color: #4ade80; }
+.avatar-opt.selected { border-color: #4ade80; background: rgba(74,222,128,0.1); box-shadow: 0 0 0 2px #4ade80; }
+.avatar-opt img { width: 100%; height: 100%; object-fit: cover; }
+.avatar-opt.upload { font-size: 18px; color: rgba(232,223,200,0.4); border-style: dashed; }
+.avatar-opt.initials { font-size: 13px; letter-spacing: 0.04em; }
+.player-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.player-avatar .av-emoji { font-size: 22px; line-height: 1; }
+.player-avatar.me { cursor: pointer; }
+.player-avatar.me::after { content: '✎'; position: absolute; top: -4px; left: -4px; width: 18px; height: 18px; border-radius: 50%; background: #4ade80; color: #0d2b1d; font-size: 10px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
+.player-avatar.me:hover::after { opacity: 1; }
